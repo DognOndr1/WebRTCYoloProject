@@ -1,0 +1,19 @@
+[Server]
+host = "127.0.0.1"
+port = 8000
+debug = false
+is_active = true
+
+[API]
+chosen_api = "Flask"
+
+[Static]
+static_directory = "app/static"
+
+[Templates]
+temp_directory= "app/templates"
+
+[Logging]
+log_file = "logs/app.log"
+log_format = "<green>{time:MMM D, YYYY - HH:mm:ss}</green> || <level>{level}</level> || <cyan>{message}</cyan> || <red>{file.name}</red> ||"
+rotation = "10 MB"
