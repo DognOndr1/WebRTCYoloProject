@@ -4752,3 +4752,37 @@ Jul 22, 2024 - 09:56:23 || INFO || Received time: {'hours': 9, 'minutes': 56, 's
 Jul 22, 2024 - 09:56:24 || INFO || Received time: {'hours': 9, 'minutes': 56, 'seconds': 24} || flaskweb.py ||36
 Jul 22, 2024 - 09:56:24 || INFO || Received time: {'hours': 9, 'minutes': 56, 'seconds': 24} || flaskweb.py ||36
 Jul 22, 2024 - 09:56:25 || INFO || Received time: {'hours': 9, 'minutes': 56, 'seconds': 25} || flaskweb.py ||36
+Jul 22, 2024 - 16:39:40 || INFO || Flask Başlatıldı || flaskweb.py ||40
+Jul 22, 2024 - 16:39:43 || INFO || Received time: {'hours': 16, 'minutes': 39, 'seconds': 43} || flaskweb.py ||37
+Jul 22, 2024 - 16:40:01 || INFO || Flask Başlatıldı || flaskweb.py ||40
+Jul 22, 2024 - 16:40:03 || INFO || Received time: {'hours': 16, 'minutes': 40, 'seconds': 3} || flaskweb.py ||37
+Jul 22, 2024 - 16:40:28 || INFO || Flask Başlatıldı || flaskweb.py ||40
+Jul 22, 2024 - 16:40:30 || INFO || Received time: {'hours': 16, 'minutes': 40, 'seconds': 30} || flaskweb.py ||37
+Jul 22, 2024 - 16:40:32 || INFO || Received time: {'hours': 16, 'minutes': 40, 'seconds': 32} || flaskweb.py ||37
+Jul 22, 2024 - 16:40:33 || INFO || Received time: {'hours': 16, 'minutes': 40, 'seconds': 33} || flaskweb.py ||37
+Jul 22, 2024 - 16:40:34 || INFO || Received time: {'hours': 16, 'minutes': 40, 'seconds': 34} || flaskweb.py ||37
+Jul 22, 2024 - 16:40:35 || INFO || Received time: {'hours': 16, 'minutes': 40, 'seconds': 35} || flaskweb.py ||37
+Jul 22, 2024 - 16:40:36 || INFO || Received time: {'hours': 16, 'minutes': 40, 'seconds': 36} || flaskweb.py ||37
+Jul 22, 2024 - 16:40:37 || INFO || Received time: {'hours': 16, 'minutes': 40, 'seconds': 37} || flaskweb.py ||37
+Jul 22, 2024 - 16:40:38 || INFO || Received time: {'hours': 16, 'minutes': 40, 'seconds': 38} || flaskweb.py ||37
+Jul 22, 2024 - 16:40:39 || INFO || Received time: {'hours': 16, 'minutes': 40, 'seconds': 39} || flaskweb.py ||37
+Jul 22, 2024 - 16:40:40 || INFO || Received time: {'hours': 16, 'minutes': 40, 'seconds': 40} || flaskweb.py ||37
+Jul 22, 2024 - 16:40:41 || INFO || Received time: {'hours': 16, 'minutes': 40, 'seconds': 41} || flaskweb.py ||37
+Jul 22, 2024 - 16:40:42 || INFO || Received time: {'hours': 16, 'minutes': 40, 'seconds': 42} || flaskweb.py ||37
+Jul 22, 2024 - 16:40:43 || INFO || Received time: {'hours': 16, 'minutes': 40, 'seconds': 43} || flaskweb.py ||37
+Jul 22, 2024 - 16:40:44 || INFO || Received time: {'hours': 16, 'minutes': 40, 'seconds': 44} || flaskweb.py ||37
+Jul 22, 2024 - 16:40:45 || INFO || Received time: {'hours': 16, 'minutes': 40, 'seconds': 45} || flaskweb.py ||37
+Jul 22, 2024 - 16:40:46 || INFO || Received time: {'hours': 16, 'minutes': 40, 'seconds': 46} || flaskweb.py ||37
+Jul 22, 2024 - 16:40:47 || INFO || Received time: {'hours': 16, 'minutes': 40, 'seconds': 47} || flaskweb.py ||37
+Jul 22, 2024 - 16:40:48 || INFO || Received time: {'hours': 16, 'minutes': 40, 'seconds': 48} || flaskweb.py ||37
+Jul 22, 2024 - 16:40:49 || INFO || Received time: {'hours': 16, 'minutes': 40, 'seconds': 49} || flaskweb.py ||37
+Jul 22, 2024 - 16:40:50 || INFO || Received time: {'hours': 16, 'minutes': 40, 'seconds': 50} || flaskweb.py ||37
+Jul 22, 2024 - 16:40:51 || INFO || Received time: {'hours': 16, 'minutes': 40, 'seconds': 51} || flaskweb.py ||37
+Jul 22, 2024 - 16:40:52 || INFO || Received time: {'hours': 16, 'minutes': 40, 'seconds': 52} || flaskweb.py ||37
+Jul 22, 2024 - 16:40:53 || INFO || Received time: {'hours': 16, 'minutes': 40, 'seconds': 53} || flaskweb.py ||37
+Jul 22, 2024 - 16:40:54 || INFO || Received time: {'hours': 16, 'minutes': 40, 'seconds': 54} || flaskweb.py ||37
+Jul 22, 2024 - 16:40:55 || INFO || Received time: {'hours': 16, 'minutes': 40, 'seconds': 55} || flaskweb.py ||37
+Jul 22, 2024 - 16:40:56 || INFO || Received time: {'hours': 16, 'minutes': 40, 'seconds': 56} || flaskweb.py ||37
+Aug 5, 2024 - 16:00:03 || INFO || Flask Başlatıldı || flaskweb.py ||40
+Aug 5, 2024 - 16:00:26 || INFO || Flask Başlatıldı || flaskweb.py ||40
+Aug 5, 2024 - 16:00:53 || INFO || FastAPI başlatıldı || fastapiweb.py ||52

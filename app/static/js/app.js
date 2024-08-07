@@ -30,5 +30,7 @@ function Clock() {
     });
 }
 
-setInterval(1000);
+setInterval(Clock,1000);
 Clock();
+
+console.log("Hello World")

@@ -22,10 +22,11 @@ class FlaskWebServer(WebServer):
         run(): Sunucunun aktif olup olmadığını kontrol eder ve sunucuyu başlatır.
     """
 
-    app = Flask(__name__)
     logger: Any = None
 
     def server(self):
+        self.app = Flask(__name__)
+
         @self.app.route("/")
         def home():
             return render_template("index.html")
