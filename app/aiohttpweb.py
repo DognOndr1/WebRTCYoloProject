@@ -1,16 +1,14 @@
-from fastapi import FastAPI, Request
-import socketio, json, ssl
-from fastapi.templating import Jinja2Templates
-from fastapi.staticfiles import StaticFiles
-from dataclasses import dataclass
+import ssl, json, cv2, socketio, aiohttp_jinja2, jinja2
 from typing import Any
-import uvicorn, cv2
-from fastapi.responses import JSONResponse
+from dataclasses import dataclass
+from aiohttp import web
 from aiortc import (
     RTCPeerConnection,
     RTCSessionDescription,
     RTCIceCandidate,
     VideoStreamTrack,
+    RTCConfiguration,
+    RTCIceServer,
 )
 from av import VideoFrame
 from aiortc.contrib.media import MediaRelay
@@ -24,55 +22,49 @@ else:
 
 
 @dataclass
-class FastAPIWebServer(WebServer):
+class AIOHTTPWeb(WebServer):
     host: str
     port: int
     is_active: bool
     debug: bool
     static_directory: str = None
     temp_directory: str = None
-    pcs: dict = None
     logger: Any = None
-    socket_app: Any = None
+    pcs: dict = None
     ssl_cert: str = None
     ssl_key: str = None
 
     def __post_init__(self):
-        self.env: str = "local.toml"
-        self.sio = socketio.AsyncServer(cors_allowed_origins="*", async_mode="asgi")
-        self.app = FastAPI()
-        self.socket_app = socketio.ASGIApp(
-            self.sio, self.app
-        )  # self.socket_app olarak tanımlayın
+        self.sio = socketio.AsyncServer(cors_allowed_origins="*")
+        self.app = web.Application()
+        self.sio.attach(self.app)
         self.relay = MediaRelay()
-        self.app.mount(
-            "/static", StaticFiles(directory=self.static_directory), name="static"
+        aiohttp_jinja2.setup(
+            self.app, loader=jinja2.FileSystemLoader(self.temp_directory)
         )
-        self.templates = Jinja2Templates(directory=self.temp_directory)
+        if self.static_directory:
+            self.app.router.add_static(
+                "/static", path=self.static_directory, name="static"
+            )
         if self.pcs is None:
             self.pcs = {}
 
-    def server(self):
-        @self.app.get("/")
-        async def home(request: Request):
-            return self.templates.TemplateResponse("index.html", {"request": request})
-
-        @self.app.get("/framework")
-        async def get_framework():
-            return JSONResponse({"framework": "fastapi"})
-
-        # Socket.IO dinleyicileri
-        @self.sio.on("connect")
-        async def connect(sid, env):
-            self.logger.info("New Client Connected to This id :" + " " + str(sid))
+    def register_socket_events(self):
+        @self.sio.event
+        async def connect(sid, environ):
+            print(f"Client Connected {sid}")
             if sid in self.pcs:
-                print(f"Existing connection for {sid} found, Closing it")
+                print(f"Existing connection for {sid} found. Closing it.")
                 await self.pcs[sid].close()
-            self.pcs[sid] = RTCPeerConnection()
+            self.pcs[sid] = RTCPeerConnection(
+                RTCConfiguration(
+                    iceServers=[RTCIceServer("stun:stun.l.google.com:19302")]
+                )
+            )
 
-        @self.sio.on("disconnect")
+        @self.sio.event
         async def disconnect(sid):
-            self.logger.info("Client disconnected: " + " " + str(sid))
+            print(f"Client Disconnected: {sid}")
             if sid in self.pcs:
                 pc = self.pcs[sid]
                 await pc.close()
@@ -83,29 +75,39 @@ class FastAPIWebServer(WebServer):
             if sid in self.pcs:
                 pc = self.pcs[sid]
                 if pc.signalingState == "closed":
-                    pc = RTCPeerConnection()
+                    pc = RTCPeerConnection(
+                        RTCConfiguration(
+                            iceServers=[RTCIceServer("stun:stun.l.google.com:19302")]
+                        )
+                    )
+
                     self.pcs[sid] = pc
             else:
-                pc = RTCPeerConnection()
+                pc = RTCPeerConnection(
+                    RTCConfiguration(
+                        iceServers=[RTCIceServer("stun:stun.l.google.com:19302")]
+                    )
+                )
+
                 self.pcs[sid] = pc
 
             offer = RTCSessionDescription(sdp=data["sdp"], type=data["type"])
-            self.logger.info("Received SDP offer")
+            print("Received SDP offer")
             print(json.dumps(data, indent=2))
 
             @pc.on("track")
             def on_track(track):
-                self.logger.info(f"Track received {track.kind}")
+                print(f"Track received: {track.kind}")
                 if track.kind == "video":
                     gray_track = GrayVideoStreamTrack(self.relay.subscribe(track))
-                    self.logger.info("Track added to PC")
+                    print("Track added to pc")
                     pc.addTrack(gray_track)
 
             await pc.setRemoteDescription(offer)
             answer = await pc.createAnswer()
             await pc.setLocalDescription(answer)
 
-            print("Generated SDP answer")
+            print("Generated SDP answer:")
             sdp_answer = json.dumps(
                 {"sdp": pc.localDescription.sdp, "type": pc.localDescription.type},
                 indent=2,
@@ -120,7 +122,7 @@ class FastAPIWebServer(WebServer):
 
         @self.sio.on("ice_candidate")
         async def handle_ice_candidate(sid, data):
-            self.logger.info("Received ICE Candidate")
+            print("Received ICE candidate")
             print(json.dumps(data, indent=2))
 
             if sid in self.pcs:
@@ -151,19 +153,23 @@ class FastAPIWebServer(WebServer):
             else:
                 print(f"No RTCPeerConnection found for sid: {sid}")
 
+    def server(self):
+        async def home(request):
+            return aiohttp_jinja2.render_template("index.html", request, {})
+
+        async def get_framework(request):
+            return web.json_response({"framework": "aiohttp"})
+
+        self.app.router.add_get("/", home)
+        self.app.router.add_get("/framework", get_framework)
+        self.register_socket_events()
+
         ssl_context = None
         if self.ssl_cert and self.ssl_key:
             ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
             ssl_context.load_cert_chain(certfile=self.ssl_cert, keyfile=self.ssl_key)
 
-        self.logger.info("FastAPI started")
-        uvicorn.run(
-            self.socket_app,
-            host=self.host,
-            port=self.port,
-            ssl_keyfile=self.ssl_key,
-            ssl_certfile=self.ssl_cert,
-        )
+        web.run_app(self.app, host=self.host, port=self.port, ssl_context=ssl_context)
 
     @check_active_decorator
     def run(self):
@@ -203,32 +209,17 @@ def parse_candidate(candidate_str):
 
 
 if __name__ == "__main__":
-
-    @dataclass
-    class Logger:
-        log_file: str
-        log_format: str
-        rotation: str
-
-        def info(self, message: str):
-            print(f"INFO: {message}")
-
-    logger_configs = {
-        "log_file": "logs/app.log",
-        "log_format": "<green>{time:MMM D, YYYY - HH:mm:ss}</green> || <level>{level}</level> || <red>{file.name}</red> || <cyan>{message}</cyan>||",
-        "rotation": "10MB",
-    }
-
-    fastapiweb = FastAPIWebServer(
-        "0.0.0.0",
-        8000,
-        True,
-        True,
+    web_server = AIOHTTPWeb(
+        host="0.0.0.0",
+        port=8000,
+        is_active=True,
+        debug=True,
         static_directory="static",
         temp_directory="templates",
-        logger=Logger(**logger_configs),
-        ssl_cert="/home/dogan/cert.pem",
-        ssl_key="/home/dogan/key.pem",
+        logger=None,
+        pcs={},
+        ssl_cert="/home/dogan/cert.pem",  # Add path to your SSL certificate
+        ssl_key="/home/dogan/key.pem",  # Add path to your SSL private key
     )
 
-    fastapiweb.run()
+    web_server.run()

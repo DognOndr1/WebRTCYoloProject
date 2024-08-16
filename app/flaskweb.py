@@ -1,6 +1,7 @@
-from flask import Flask, render_template, request, jsonify
-from dataclasses import dataclass
+from flask import Flask, render_template, jsonify
+from dataclasses import dataclass, field
 from typing import Any
+import logging
 
 if __name__ == "__main__":
     from webapp import WebServer
@@ -12,33 +13,32 @@ else:
 
 @dataclass
 class FlaskWebServer(WebServer):
-    """
-    Flask tabanlı bir web sunucusu.
-    Attributes:
-        app (Flask): Flask uygulama nesnesi.
-        logger (Any): Loglama için kullanılan logger nesnesi.
-    Methods:
-        server(): Flask uygulamasını başlatır ve ana sayfa rotasını tanımlar.
-        run(): Sunucunun aktif olup olmadığını kontrol eder ve sunucuyu başlatır.
-    """
+    host: str
+    port: int
+    is_active: bool
+    debug: bool
+    logger: Any = field(default=None)
 
-    logger: Any = None
+    def __post_init__(self):
+        self.env: str = "local.toml"
+        self.app = Flask(__name__)
+        self.app.debug = self.debug
+
+        if self.logger is None:
+            logging.basicConfig(level=logging.INFO)
+            self.logger = logging.getLogger(__name__)
 
     def server(self):
-        self.app = Flask(__name__)
-
         @self.app.route("/")
         def home():
             return render_template("index.html")
 
-        @self.app.route("/api/time", methods=["POST"])
-        def log_time():
-            time_data = request.json
-            self.logger.info(f"Received time: {time_data}")
-            return jsonify({"Message": "Time received", "data": time_data})
+        @self.app.route("/framework")
+        def get_framework():
+            return jsonify({"framework": "flask"})
 
         self.logger.info("Flask Başlatıldı")
-        self.app.run(host=self.host, port=self.port, debug=self.debug)
+        self.app.run(host=self.host, port=self.port)
 
     @check_active_decorator
     def run(self):
@@ -63,6 +63,10 @@ if __name__ == "__main__":
     }
 
     flaskwebserver = FlaskWebServer(
-        "127.0.0.1", 8000, True, True, logger=Logger(**logger_configs)
+        "0.0.0.0",
+        8000,
+        True,
+        True,
+        logger=Logger(**logger_configs),
     )
     flaskwebserver.run()

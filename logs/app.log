@@ -4786,3 +4786,141 @@ Jul 22, 2024 - 16:40:56 || INFO || Received time: {'hours': 16, 'minutes': 40, '
 Aug 5, 2024 - 16:00:03 || INFO || Flask Başlatıldı || flaskweb.py ||40
 Aug 5, 2024 - 16:00:26 || INFO || Flask Başlatıldı || flaskweb.py ||40
 Aug 5, 2024 - 16:00:53 || INFO || FastAPI başlatıldı || fastapiweb.py ||52
+Aug 12, 2024 - 14:42:56 || INFO || FastAPI başlatıldı || fastapiweb.py ||52
+Aug 12, 2024 - 14:43:26 || INFO || Flask Başlatıldı || flaskweb.py ||40
+Aug 12, 2024 - 14:45:46 || INFO || Flask Başlatıldı || flaskweb.py ||40
+Aug 12, 2024 - 14:48:18 || INFO || Flask Başlatıldı || flaskweb.py ||40
+Aug 12, 2024 - 15:31:47 || INFO || Flask Başlatıldı || flaskweb.py ||40
+Aug 12, 2024 - 15:49:02 || INFO || Flask Başlatıldı || flaskweb.py ||40
+Aug 12, 2024 - 15:50:56 || INFO || Flask Başlatıldı || flaskweb.py ||40
+Aug 12, 2024 - 15:55:06 || INFO || Flask Başlatıldı || flaskweb.py ||40
+Aug 12, 2024 - 15:56:29 || INFO || Flask Başlatıldı || flaskweb.py ||40
+Aug 12, 2024 - 15:58:12 || INFO || Flask Başlatıldı || flaskweb.py ||40
+Aug 12, 2024 - 16:00:10 || INFO || Flask Başlatıldı || flaskweb.py ||40
+Aug 12, 2024 - 16:00:31 || INFO || Flask Başlatıldı || flaskweb.py ||40
+Aug 12, 2024 - 16:00:32 || INFO || Flask Başlatıldı || flaskweb.py ||40
+Aug 12, 2024 - 16:04:40 || INFO || Flask Başlatıldı || flaskweb.py ||40
+Aug 12, 2024 - 16:04:41 || INFO || Flask Başlatıldı || flaskweb.py ||40
+Aug 12, 2024 - 16:05:40 || INFO || Flask Başlatıldı || flaskweb.py ||40
+Aug 12, 2024 - 16:05:41 || INFO || Flask Başlatıldı || flaskweb.py ||40
+Aug 12, 2024 - 16:34:19 || INFO || FastAPI başlatıldı || fastapiweb.py ||52
+Aug 12, 2024 - 17:08:48 || INFO || Flask Başlatıldı || flaskweb.py ||40
+Aug 12, 2024 - 17:08:49 || INFO || Flask Başlatıldı || flaskweb.py ||40
+Aug 12, 2024 - 17:35:43 || INFO || Flask Başlatıldı || flaskweb.py ||40
+Aug 12, 2024 - 17:35:44 || INFO || Flask Başlatıldı || flaskweb.py ||40
+Aug 12, 2024 - 17:36:22 || INFO || Flask Başlatıldı || flaskweb.py ||40
+Aug 12, 2024 - 23:37:54 || INFO || Flask Başlatıldı || flaskweb.py ||40
+Aug 12, 2024 - 23:37:54 || INFO || Flask Başlatıldı || flaskweb.py ||40
+Aug 13, 2024 - 14:46:54 || INFO || Flask Başlatıldı || flaskweb.py ||40
+Aug 13, 2024 - 14:46:55 || INFO || Flask Başlatıldı || flaskweb.py ||40
+Aug 13, 2024 - 14:49:08 || INFO || Flask Başlatıldı || flaskweb.py ||34
+Aug 13, 2024 - 14:49:08 || INFO || Flask Başlatıldı || flaskweb.py ||34
+Aug 13, 2024 - 16:02:21 || ERROR || Server Başlatılamadı: __init__() got an unexpected keyword argument 'static_directory' || main.py ||33
+Aug 13, 2024 - 16:03:42 || ERROR || Server Başlatılamadı: __init__() got an unexpected keyword argument 'static_directory' || main.py ||34
+Aug 13, 2024 - 16:03:49 || ERROR || Server Başlatılamadı: __init__() got an unexpected keyword argument 'static_directory' || main.py ||34
+Aug 13, 2024 - 16:05:46 || ERROR || Server Başlatılamadı: __init__() got an unexpected keyword argument 'static_directory' || main.py ||34
+Aug 13, 2024 - 16:05:52 || INFO || Flask Başlatıldı || flaskweb.py ||34
+Aug 13, 2024 - 16:05:53 || INFO || Flask Başlatıldı || flaskweb.py ||34
+Aug 13, 2024 - 16:06:40 || INFO || Flask Başlatıldı || flaskweb.py ||34
+Aug 13, 2024 - 16:06:55 || INFO || Flask Başlatıldı || flaskweb.py ||34
+Aug 13, 2024 - 16:06:56 || INFO || Flask Başlatıldı || flaskweb.py ||34
+Aug 13, 2024 - 16:09:41 || INFO || FastAPI başlatıldı || fastapiweb.py ||40
+Aug 13, 2024 - 16:14:59 || ERROR || Server Başlatılamadı: __init__() got an unexpected keyword argument 'static_directory' || main.py ||24
+Aug 13, 2024 - 16:15:06 || INFO || FastAPI başlatıldı || fastapiweb.py ||40
+Aug 14, 2024 - 09:26:02 || INFO || FastAPI başlatıldı || fastapiweb.py ||40
+Aug 14, 2024 - 09:50:27 || INFO || FastAPI başlatıldı || fastapiweb.py ||45
+Aug 14, 2024 - 09:52:12 || INFO || FastAPI başlatıldı || fastapiweb.py ||45
+Aug 14, 2024 - 09:53:19 || INFO || FastAPI başlatıldı || fastapiweb.py ||45
+Aug 14, 2024 - 09:53:56 || INFO || FastAPI başlatıldı || fastapiweb.py ||45
+Aug 14, 2024 - 09:54:43 || INFO || FastAPI başlatıldı || fastapiweb.py ||45
+Aug 14, 2024 - 09:56:52 || INFO || FastAPI başlatıldı || fastapiweb.py ||45
+Aug 14, 2024 - 12:57:34 || ERROR || Server Başlatılamadı: [Errno 99] error while attempting to bind on address ('192.168.0.125', 8000): cannot assign requested address || main.py ||34
+Aug 14, 2024 - 14:50:09 || WARNING || Invalid API choice || main.py ||31
+Aug 14, 2024 - 14:51:12 || INFO || FastAPI başlatıldı || fastapiweb.py ||45
+Aug 14, 2024 - 14:51:35 || ERROR || Server failed to start: __init__() got an unexpected keyword argument 'static_directory' || main.py ||33
+Aug 14, 2024 - 14:58:16 || ERROR || Server failed to start: __init__() got an unexpected keyword argument 'static_directory' || main.py ||33
+Aug 14, 2024 - 14:58:32 || INFO || FastAPI başlatıldı || fastapiweb.py ||45
+Aug 14, 2024 - 15:00:32 || INFO || FastAPI başlatıldı || fastapiweb.py ||45
+Aug 14, 2024 - 15:01:07 || INFO || FastAPI başlatıldı || fastapiweb.py ||45
+Aug 14, 2024 - 15:02:26 || INFO || FastAPI başlatıldı || fastapiweb.py ||45
+Aug 14, 2024 - 15:02:47 || INFO || FastAPI başlatıldı || fastapiweb.py ||45
+Aug 14, 2024 - 15:05:08 || INFO || FastAPI başlatıldı || fastapiweb.py ||45
+Aug 14, 2024 - 15:15:25 || INFO || FastAPI başlatıldı || fastapiweb.py ||45
+Aug 14, 2024 - 15:16:00 || INFO || FastAPI başlatıldı || fastapiweb.py ||45
+Aug 14, 2024 - 16:10:42 || ERROR || Server failed to start: __init__() got an unexpected keyword argument 'static_directory' || main.py ||33
+Aug 14, 2024 - 16:12:45 || ERROR || Server failed to start: __init__() got an unexpected keyword argument 'static_directory' || main.py ||33
+Aug 14, 2024 - 16:17:46 || ERROR || Server failed to start: __init__() got an unexpected keyword argument 'static_directory' || main.py ||33
+Aug 14, 2024 - 16:19:04 || ERROR || Server failed to start: __init__() got an unexpected keyword argument 'static_directory' || main.py ||33
+Aug 14, 2024 - 16:20:22 || ERROR || Server failed to start: __init__() got an unexpected keyword argument 'static_directory' || main.py ||33
+Aug 14, 2024 - 16:21:22 || ERROR || Server failed to start: __init__() got an unexpected keyword argument 'static_directory' || main.py ||33
+Aug 14, 2024 - 16:24:25 || INFO || Flask Başlatıldı || flaskweb.py ||41
+Aug 14, 2024 - 16:24:26 || INFO || Flask Başlatıldı || flaskweb.py ||41
+Aug 14, 2024 - 16:25:38 || INFO || Flask Başlatıldı || flaskweb.py ||41
+Aug 14, 2024 - 16:25:39 || INFO || Flask Başlatıldı || flaskweb.py ||41
+Aug 14, 2024 - 16:26:04 || INFO || FastAPI başlatıldı || fastapiweb.py ||45
+Aug 14, 2024 - 16:27:50 || INFO || FastAPI başlatıldı || fastapiweb.py ||45
+Aug 14, 2024 - 16:27:59 || INFO || Flask Başlatıldı || flaskweb.py ||41
+Aug 14, 2024 - 16:28:00 || INFO || Flask Başlatıldı || flaskweb.py ||41
+Aug 14, 2024 - 16:29:14 || INFO || Flask Başlatıldı || flaskweb.py ||42
+Aug 14, 2024 - 16:29:20 || INFO || Flask Başlatıldı || flaskweb.py ||42
+Aug 14, 2024 - 16:29:21 || INFO || Flask Başlatıldı || flaskweb.py ||42
+Aug 14, 2024 - 17:01:08 || INFO || Flask Başlatıldı || flaskweb.py ||40
+Aug 14, 2024 - 17:01:09 || INFO || Flask Başlatıldı || flaskweb.py ||40
+Aug 14, 2024 - 17:01:46 || INFO || Flask Başlatıldı || flaskweb.py ||40
+Aug 14, 2024 - 17:02:21 || INFO || Flask Başlatıldı || flaskweb.py ||40
+Aug 14, 2024 - 17:02:22 || INFO || Flask Başlatıldı || flaskweb.py ||40
+Aug 14, 2024 - 17:05:12 || INFO || Flask Başlatıldı || flaskweb.py ||40
+Aug 14, 2024 - 17:05:13 || INFO || Flask Başlatıldı || flaskweb.py ||40
+Aug 14, 2024 - 17:05:23 || INFO || Flask Başlatıldı || flaskweb.py ||40
+Aug 14, 2024 - 17:05:24 || INFO || Flask Başlatıldı || flaskweb.py ||40
+Aug 14, 2024 - 17:08:06 || INFO || Flask Başlatıldı || flaskweb.py ||40
+Aug 14, 2024 - 17:08:07 || INFO || Flask Başlatıldı || flaskweb.py ||40
+Aug 14, 2024 - 17:08:14 || INFO || Flask Başlatıldı || flaskweb.py ||40
+Aug 14, 2024 - 17:08:24 || INFO || Flask Başlatıldı || flaskweb.py ||40
+Aug 14, 2024 - 17:08:36 || INFO || Flask Başlatıldı || flaskweb.py ||40
+Aug 14, 2024 - 17:08:38 || INFO || Flask Başlatıldı || flaskweb.py ||40
+Aug 14, 2024 - 17:09:01 || INFO || Flask Başlatıldı || flaskweb.py ||40
+Aug 14, 2024 - 17:09:02 || INFO || Flask Başlatıldı || flaskweb.py ||40
+Aug 14, 2024 - 17:10:02 || INFO || Flask Başlatıldı || flaskweb.py ||42
+Aug 14, 2024 - 17:10:03 || INFO || Flask Başlatıldı || flaskweb.py ||42
+Aug 14, 2024 - 17:13:13 || INFO || FastAPI başlatıldı || fastapiweb.py ||45
+Aug 15, 2024 - 11:31:38 || INFO || FastAPI started || fastapiweb.py ||159
+Aug 15, 2024 - 11:31:43 || INFO || New Client Connected to This id : 71AWNvINUC82_nBXAAAB || fastapiweb.py ||67
+Aug 15, 2024 - 11:31:43 || INFO || New Client Connected to This id : VPrrArO8d-v3VagAAAAD || fastapiweb.py ||67
+Aug 15, 2024 - 11:31:50 || INFO || Client disconnected:  71AWNvINUC82_nBXAAAB || fastapiweb.py ||75
+Aug 15, 2024 - 11:31:50 || INFO || Client disconnected:  VPrrArO8d-v3VagAAAAD || fastapiweb.py ||75
+Aug 15, 2024 - 11:33:27 || INFO || FastAPI started || fastapiweb.py ||159
+Aug 15, 2024 - 11:33:29 || INFO || New Client Connected to This id : coQfLz8jgmljkLW6AAAB || fastapiweb.py ||67
+Aug 15, 2024 - 11:33:29 || INFO || New Client Connected to This id : ABM7Z00qH3-CPhNfAAAD || fastapiweb.py ||67
+Aug 15, 2024 - 11:33:36 || INFO || Received SDP offer || fastapiweb.py ||93
+Aug 15, 2024 - 11:33:36 || INFO || Track received video || fastapiweb.py ||98
+Aug 15, 2024 - 11:33:36 || INFO || Track added to PC || fastapiweb.py ||101
+Aug 15, 2024 - 11:33:36 || INFO || Received ICE Candidate || fastapiweb.py ||123
+Aug 15, 2024 - 11:33:36 || INFO || Received ICE Candidate || fastapiweb.py ||123
+Aug 15, 2024 - 11:33:36 || INFO || Received ICE Candidate || fastapiweb.py ||123
+Aug 15, 2024 - 11:33:36 || INFO || Received ICE Candidate || fastapiweb.py ||123
+Aug 15, 2024 - 11:33:36 || INFO || Received ICE Candidate || fastapiweb.py ||123
+Aug 15, 2024 - 11:33:36 || INFO || Received ICE Candidate || fastapiweb.py ||123
+Aug 15, 2024 - 11:33:36 || INFO || Received ICE Candidate || fastapiweb.py ||123
+Aug 15, 2024 - 11:33:36 || INFO || Received ICE Candidate || fastapiweb.py ||123
+Aug 15, 2024 - 11:33:36 || INFO || Received ICE Candidate || fastapiweb.py ||123
+Aug 15, 2024 - 11:33:37 || INFO || Received ICE Candidate || fastapiweb.py ||123
+Aug 15, 2024 - 11:33:37 || INFO || Received ICE Candidate || fastapiweb.py ||123
+Aug 15, 2024 - 11:33:37 || INFO || Received ICE Candidate || fastapiweb.py ||123
+Aug 15, 2024 - 11:33:37 || INFO || Received ICE Candidate || fastapiweb.py ||123
+Aug 15, 2024 - 11:33:56 || INFO || Client disconnected:  ABM7Z00qH3-CPhNfAAAD || fastapiweb.py ||75
+Aug 15, 2024 - 11:33:56 || INFO || Client disconnected:  coQfLz8jgmljkLW6AAAB || fastapiweb.py ||75
+Aug 16, 2024 - 14:28:55 || ERROR || Server failed to start: [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use || main.py ||46
+Aug 16, 2024 - 15:51:34 || INFO || FastAPI started || fastapiweb.py ||159
+Aug 16, 2024 - 15:51:34 || INFO || New Client Connected to This id : MO9I-xGFCYtMrDY_AAAB || fastapiweb.py ||67
+Aug 16, 2024 - 15:51:34 || INFO || New Client Connected to This id : LTdV_9z-e_Xi7JtAAAAD || fastapiweb.py ||67
+Aug 16, 2024 - 15:51:38 || INFO || New Client Connected to This id : wt2heclBiMgZa4CmAAAF || fastapiweb.py ||67
+Aug 16, 2024 - 16:00:34 || INFO || Client disconnected:  wt2heclBiMgZa4CmAAAF || fastapiweb.py ||75
+Aug 16, 2024 - 16:00:34 || INFO || New Client Connected to This id : dv7D5CDUzOscfNYEAAAH || fastapiweb.py ||67
+Aug 16, 2024 - 16:01:48 || INFO || Client disconnected:  dv7D5CDUzOscfNYEAAAH || fastapiweb.py ||75
+Aug 16, 2024 - 16:29:31 || INFO || Client disconnected:  MO9I-xGFCYtMrDY_AAAB || fastapiweb.py ||75
+Aug 16, 2024 - 16:29:31 || INFO || New Client Connected to This id : vxKC0yp0hg5YKr1rAAAJ || fastapiweb.py ||67
+Aug 16, 2024 - 16:29:33 || INFO || Client disconnected:  LTdV_9z-e_Xi7JtAAAAD || fastapiweb.py ||75
+Aug 16, 2024 - 16:29:33 || INFO || New Client Connected to This id : BmySPfIe5w4f1qcOAAAL || fastapiweb.py ||67
+Aug 16, 2024 - 16:29:35 || INFO || Client disconnected:  BmySPfIe5w4f1qcOAAAL || fastapiweb.py ||75
+Aug 16, 2024 - 16:39:51 || INFO || Client disconnected:  vxKC0yp0hg5YKr1rAAAJ || fastapiweb.py ||75
