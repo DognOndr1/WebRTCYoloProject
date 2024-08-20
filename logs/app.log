@@ -4924,3 +4924,26 @@ Aug 16, 2024 - 16:29:33 || INFO || Client disconnected:  LTdV_9z-e_Xi7JtAAAAD ||
 Aug 16, 2024 - 16:29:33 || INFO || New Client Connected to This id : BmySPfIe5w4f1qcOAAAL || fastapiweb.py ||67
 Aug 16, 2024 - 16:29:35 || INFO || Client disconnected:  BmySPfIe5w4f1qcOAAAL || fastapiweb.py ||75
 Aug 16, 2024 - 16:39:51 || INFO || Client disconnected:  vxKC0yp0hg5YKr1rAAAJ || fastapiweb.py ||75
+Aug 19, 2024 - 17:30:14 || INFO || FastAPI started || fastapiweb.py ||159
+Aug 19, 2024 - 17:30:19 || INFO || New Client Connected to This id : LRXezknVajEFNYe_AAAB || fastapiweb.py ||67
+Aug 19, 2024 - 17:30:20 || INFO || New Client Connected to This id : Tn9upSYGhuiKwaX6AAAD || fastapiweb.py ||67
+Aug 19, 2024 - 17:30:21 || INFO || Received SDP offer || fastapiweb.py ||93
+Aug 19, 2024 - 17:30:21 || INFO || Track received video || fastapiweb.py ||98
+Aug 19, 2024 - 17:30:21 || INFO || Track added to PC || fastapiweb.py ||101
+Aug 19, 2024 - 17:30:21 || INFO || Received ICE Candidate || fastapiweb.py ||123
+Aug 19, 2024 - 17:30:21 || INFO || Received ICE Candidate || fastapiweb.py ||123
+Aug 19, 2024 - 17:30:21 || INFO || Received ICE Candidate || fastapiweb.py ||123
+Aug 19, 2024 - 17:30:21 || INFO || Received ICE Candidate || fastapiweb.py ||123
+Aug 19, 2024 - 17:30:21 || INFO || Received ICE Candidate || fastapiweb.py ||123
+Aug 19, 2024 - 17:30:21 || INFO || Received ICE Candidate || fastapiweb.py ||123
+Aug 19, 2024 - 17:30:21 || INFO || Received ICE Candidate || fastapiweb.py ||123
+Aug 19, 2024 - 17:30:21 || INFO || Received ICE Candidate || fastapiweb.py ||123
+Aug 19, 2024 - 17:30:21 || INFO || Received ICE Candidate || fastapiweb.py ||123
+Aug 19, 2024 - 17:30:21 || INFO || Received ICE Candidate || fastapiweb.py ||123
+Aug 19, 2024 - 17:30:21 || INFO || Received ICE Candidate || fastapiweb.py ||123
+Aug 19, 2024 - 17:30:21 || INFO || Received ICE Candidate || fastapiweb.py ||123
+Aug 19, 2024 - 17:30:21 || INFO || Received ICE Candidate || fastapiweb.py ||123
+Aug 19, 2024 - 17:30:23 || INFO || New Client Connected to This id : Tr15cdbaNMqEIih_AAAF || fastapiweb.py ||67
+Aug 19, 2024 - 17:30:24 || INFO || Client disconnected:  Tn9upSYGhuiKwaX6AAAD || fastapiweb.py ||75
+Aug 19, 2024 - 17:30:24 || INFO || Client disconnected:  Tr15cdbaNMqEIih_AAAF || fastapiweb.py ||75
+Aug 19, 2024 - 17:30:24 || INFO || Client disconnected:  LRXezknVajEFNYe_AAAB || fastapiweb.py ||75

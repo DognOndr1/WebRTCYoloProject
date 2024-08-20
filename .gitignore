@@ -74,3 +74,6 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+key.pem
+cert.pem
