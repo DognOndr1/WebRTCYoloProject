@@ -77,3 +77,7 @@ ENV/
 
 key.pem
 cert.pem
+
+women.jpg
+yoloboxes.py
+yolov8n.pt

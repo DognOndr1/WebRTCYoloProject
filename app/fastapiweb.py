@@ -186,13 +186,10 @@ class GrayVideoStreamTrack(VideoStreamTrack):
         if not isinstance(frame, VideoFrame):
             raise ValueError("Frame is not a VideoFrame")
 
-        # Convert frame to numpy array
         img = np.array(frame.to_ndarray(format="bgr24"))
 
-        # Process frame using detector
         processed_frame = self.detector.process_frame(img)
-
-        # Convert processed frame back to VideoFrame
+        
         if processed_frame is None or not isinstance(processed_frame, np.ndarray):
             raise ValueError("Processed frame is None or not a numpy array")
 
