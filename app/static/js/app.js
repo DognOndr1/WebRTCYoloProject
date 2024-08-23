@@ -1,3 +1,6 @@
+/*
+    * -----------------------------------------------------------------------STUN / TURN Sunucuları Ayarlanıyor --------------------------------------------------------------------
+*/
 const config = {
     iceServers: [
         {
@@ -6,6 +9,10 @@ const config = {
     ]
 };
 
+
+/*
+    * -----------------------------------------------------------------------Kullanılacak Medya Akışları Belirleniyor --------------------------------------------------------------------
+*/
 const constraints = {
     video: { deviceId: undefined }, 
     audio: false
@@ -14,58 +21,103 @@ const constraints = {
 let pc = null;
 let socket = null;
 let stream = null;
+let isStreaming = false;
 
+
+/*
+    * -----------------------------------------------------------------------HTML Elementleri ALınıyor --------------------------------------------------------------------
+*/
 const startBtn = document.querySelector("button#startButton");
 const stopBtn = document.querySelector("button#stopButton");
 const remoteVideo = document.querySelector("video#remoteVideo");
 const logsContainer = document.querySelector(".logs");
 const toggleButton = document.querySelector("#toggleButton");
 const deviceSelect = document.getElementById("devices");
+const detectorBtn = document.querySelector(".detector-btn");
+const video_feed = document.querySelector("#video_feed")
+const detectorSection = document.querySelector(".detector-section")
+const videoSection = document.querySelector(".video-sec");
+const videoFeed = document.querySelector("#video_feed");
 
-let isStreaming = false;
 
-
-
-function log(message, level = 'info') {
-    console.log(message);
-
-    const logEntry = document.createElement('p');
-    logEntry.textContent = message;
-
-    // Apply CSS class based on log level
-    switch (level) {
-        case 'error':
-            logEntry.className = 'log-error';
-            break;
-        case 'warning':
-            logEntry.className = 'log-warning';
-            break;
-        default:
-            logEntry.className = 'log-info';
-            break;
+/*
+    * -----------------------------------------------------------------------Obje Tespiti Buton Ayarları --------------------------------------------------------------------
+*/
+document.querySelector(".detector-btn").addEventListener("click", function(){
+/*
+    * -------------------------------------------------------------Buton İçindeki Yazıya Göre Buton İşlevi Belirleniyor --------------------------------------------------------------------
+*/
+    if (detectorBtn.innerHTML === "Start") {
+        // Start işlemi
+        fetch('/start', {
+            method: 'GET'
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            videoFeed.src = "/video_feed";
+        })
+        .then(() => startB())
+        .catch(error => console.log('Error: ' + error));
+    } else {
+        // Stop işlemi
+        fetch('/stop', {
+            method: 'GET'
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            videoFeed.src = ""; // Video akışını durdurmak için src'yi boş yapıyoruz
+        })
+        .then(() => stopB())
+        .catch(error => console.log('Error: ' + error));
     }
+});
 
-    logsContainer.appendChild(logEntry);
-    logsContainer.scrollTop = logsContainer.scrollHeight;
+function startB(){
+    detectorBtn.innerHTML = "Stop";
+    detectorBtn.classList.add("bg-danger");
+    detectorBtn.classList.remove("bg-dark");
 }
 
-const videoSection = document.querySelector(".video-sec");
+function stopB(){
+    detectorBtn.innerHTML = "Start";
+    detectorBtn.classList.remove("bg-danger");
+    detectorBtn.classList.add("bg-dark");
+}
+
+
+/*
+    * ----------------------------------------------------------Kullanılarn Frameworke Göre Arayüz Ayarlanıyor --------------------------------------------------------------------
+*/
+
+fetch('/framework')
+    .then(response => response.json())
+    .then(data => {
+        setUIForFramework(data.framework);
+    })
+    .catch(error => log('Error: ' + error, 'error'));
 
 function setUIForFramework(framework) {
-    if (framework === 'aiohttp') {
-        videoSection.style.opacity = '1'; 
-        
-    } 
-    else if(framework === 'fastapi'){
-        videoSection.style.opacity = '1'; 
-        
-    }
-    else {
+    if (framework === 'aiohttp' || framework === 'fastapi') {
+        videoSection.style.display = 'flex'; 
+        videoSection.style.flexDirection = 'column'; 
+        detectorSection.style.display = "none"; 
+        connectSocket();
+        getConnectedDevices();
+    } else {
         log("Fast or Flask selected");
-        videoSection.style.opacity = '0'; // Hide the section
+        videoSection.style.display = 'none';
+        detectorSection.style.justifyContent = "center"
     }
 }
 
+
+/*
+    * ---------------------------------------------------------------Filtre Butonu CSS Özellikleri Ayarlanıyor --------------------------------------------------------------------
+*/
 async function toggleStream() {
     if (isStreaming) {
         await stop();
@@ -80,13 +132,10 @@ async function toggleStream() {
     }
 }
 
-fetch('/framework')
-    .then(response => response.json())
-    .then(data => {
-        setUIForFramework(data.framework);
-    })
-    .catch(error => log('Error: ' + error));
 
+/*
+    * ----------------------------------------------------------------------Socket IO Ayarları Yapılıyor --------------------------------------------------------------------
+*/
 function connectSocket() {
     socket = io(); 
 
@@ -105,7 +154,7 @@ function connectSocket() {
             await pc.addIceCandidate(rtcCandidate);
             log("Successfully added ICE candidate from server");
         } catch (error) {
-            log("Error adding received ICE candidate: " + error);
+            log("Error adding received ICE candidate: " + error, 'error');
         }
     });
 
@@ -115,11 +164,15 @@ function connectSocket() {
             await pc.setRemoteDescription(new RTCSessionDescription(answer));
             log("Set Remote Answer");
         } catch (error) {
-            log("Error setting remote description: " + error);
+            log("Error setting remote description: " + error, 'error');
         }
     });
 }
 
+
+/*
+    * -----------------------------------------------------------------------WebRTC İşlemleri Yapılıyor--------------------------------------------------------------------
+*/
 async function getMedia(deviceId) {
     try {
         if (stream) {
@@ -171,10 +224,14 @@ async function getMedia(deviceId) {
         socket.emit('sdp', { type: offer.type, sdp: offer.sdp });
 
     } catch (error) {
-        log("Error in getMedia: " + error);
+        log("Error in getMedia: " + error, 'error');
     }
 }
 
+
+/*
+    * -----------------------------------------------------------------------Bağlı ve Dahili Medya Cihazları --------------------------------------------------------------------
+*/
 function getConnectedDevices() {
     navigator.mediaDevices.enumerateDevices()
     .then(devices => {
@@ -186,6 +243,7 @@ function getConnectedDevices() {
     });
 }
 
+///////////////////////
 function addOptionToSelect(optionText, optionValue) {
     const option = document.createElement("option");
     option.text = optionText;
@@ -193,27 +251,31 @@ function addOptionToSelect(optionText, optionValue) {
     deviceSelect.appendChild(option);
 }
 
+
+/*
+    * -----------------------------------------------------------------------HTML Elementleri ALınıyor --------------------------------------------------------------------
+*/
 async function start() {
     try {
         if (pc) {
             pc.close();
             pc = null;
         }
-        const selectedDeviceId = deviceSelect.value; // Get selected device ID
+        const selectedDeviceId = deviceSelect.value; // Seçilen Medya Cihazı ID'sini Alma
         if (selectedDeviceId) {
             await getMedia(selectedDeviceId);
             log("Video stream started");
         } else {
-            log("No video device selected");
+            log("No video device selected", 'warning');
         }
     } catch (error) {
-        log("Error starting the connection: " + error);
+        log("Error starting the connection: " + error, 'error');
     }
 }
 
 function stop() {
     log("Stopping Video");
-    logsContainer.innerHTML = ""
+    logsContainer.innerHTML = "";
 
     if (stream) {
         stream.getTracks().forEach(track => track.stop());
@@ -229,9 +291,35 @@ function stop() {
     log("Video stream stopped");
 }
 
-connectSocket();
-getConnectedDevices();
+
+
 
 toggleButton.addEventListener("click", toggleStream);
 
 log("Script loaded. Click the start button to begin.");
+
+/*
+    * -----------------------------------------------------------------------HTML Elementleri ALınıyor --------------------------------------------------------------------
+*/
+
+function log(message, level = 'info') {
+    console.log(message);
+
+    const logEntry = document.createElement('p');
+    logEntry.textContent = message;
+
+    switch (level) {
+        case 'error':
+            logEntry.className = 'log-error';
+            break;
+        case 'warning':
+            logEntry.className = 'log-warning';
+            break;
+        default:
+            logEntry.className = 'log-info';
+            break;
+    }
+
+    logsContainer.appendChild(logEntry);
+    logsContainer.scrollTop = logsContainer.scrollHeight;
+}

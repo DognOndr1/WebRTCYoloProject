@@ -12,11 +12,15 @@ from aiortc import (
 )
 from av import VideoFrame
 from aiortc.contrib.media import MediaRelay
+import cv2
+import numpy as np
 
 if __name__ == "__main__":
+    from detector import Detector
     from webapp import WebServer
     from decorater import check_active_decorator
 else:
+    from app.detector import Detector
     from app.webapp import WebServer
     from app.decorater import check_active_decorator
 
@@ -180,18 +184,27 @@ class GrayVideoStreamTrack(VideoStreamTrack):
     def __init__(self, track):
         super().__init__()
         self.track = track
+        self.detector = Detector()
 
     async def recv(self):
-        frame = await self.track.recv()
-        img = frame.to_ndarray(format="bgr24")
+        frame = await self.track.recv()  # Alınan çerçeve
+        if not isinstance(frame, VideoFrame):
+            raise ValueError("Frame is not a VideoFrame")
 
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        gray = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
+        # Convert frame to numpy array
+        img = np.array(frame.to_ndarray(format="bgr24"))
 
-        new_frame = VideoFrame.from_ndarray(gray, format="bgr24")
-        new_frame.pts = frame.pts
+        # Process frame using detector
+        processed_frame = self.detector.process_frame(img)
+
+        # Convert processed frame back to VideoFrame
+        if processed_frame is None or not isinstance(processed_frame, np.ndarray):
+            raise ValueError("Processed frame is None or not a numpy array")
+
+        new_frame = VideoFrame.from_ndarray(processed_frame, format="bgr24")
         new_frame.time_base = frame.time_base
-
+        new_frame.pts = frame.pts
+        new_frame.dts = frame.dts
         return new_frame
 
 

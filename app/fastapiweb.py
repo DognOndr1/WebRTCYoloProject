@@ -6,6 +6,9 @@ from dataclasses import dataclass
 from typing import Any
 import uvicorn, cv2
 from fastapi.responses import JSONResponse
+import cv2
+import numpy as np
+
 from aiortc import (
     RTCPeerConnection,
     RTCSessionDescription,
@@ -16,9 +19,11 @@ from av import VideoFrame
 from aiortc.contrib.media import MediaRelay
 
 if __name__ == "__main__":
+    from detector import Detector
     from webapp import WebServer
     from decorater import check_active_decorator
 else:
+    from app.detector import Detector
     from app.webapp import WebServer
     from app.decorater import check_active_decorator
 
@@ -41,9 +46,7 @@ class FastAPIWebServer(WebServer):
         self.env: str = "local.toml"
         self.sio = socketio.AsyncServer(cors_allowed_origins="*", async_mode="asgi")
         self.app = FastAPI()
-        self.socket_app = socketio.ASGIApp(
-            self.sio, self.app
-        )  # self.socket_app olarak tanımlayın
+        self.socket_app = socketio.ASGIApp(self.sio, self.app)
         self.relay = MediaRelay()
         self.app.mount(
             "/static", StaticFiles(directory=self.static_directory), name="static"
@@ -64,6 +67,7 @@ class FastAPIWebServer(WebServer):
         # Socket.IO dinleyicileri
         @self.sio.on("connect")
         async def connect(sid, env):
+            
             self.logger.info("New Client Connected to This id :" + " " + str(sid))
             if sid in self.pcs:
                 print(f"Existing connection for {sid} found, Closing it")
@@ -97,6 +101,7 @@ class FastAPIWebServer(WebServer):
             def on_track(track):
                 self.logger.info(f"Track received {track.kind}")
                 if track.kind == "video":
+                    print("Gray Track Mesajı")
                     gray_track = GrayVideoStreamTrack(self.relay.subscribe(track))
                     self.logger.info("Track added to PC")
                     pc.addTrack(gray_track)
@@ -174,18 +179,27 @@ class GrayVideoStreamTrack(VideoStreamTrack):
     def __init__(self, track):
         super().__init__()
         self.track = track
+        self.detector = Detector()
 
     async def recv(self):
-        frame = await self.track.recv()
-        img = frame.to_ndarray(format="bgr24")
+        frame = await self.track.recv()  # Alınan çerçeve
+        if not isinstance(frame, VideoFrame):
+            raise ValueError("Frame is not a VideoFrame")
 
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        gray = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
+        # Convert frame to numpy array
+        img = np.array(frame.to_ndarray(format="bgr24"))
 
-        new_frame = VideoFrame.from_ndarray(gray, format="bgr24")
-        new_frame.pts = frame.pts
+        # Process frame using detector
+        processed_frame = self.detector.process_frame(img)
+
+        # Convert processed frame back to VideoFrame
+        if processed_frame is None or not isinstance(processed_frame, np.ndarray):
+            raise ValueError("Processed frame is None or not a numpy array")
+
+        new_frame = VideoFrame.from_ndarray(processed_frame, format="bgr24")
         new_frame.time_base = frame.time_base
-
+        new_frame.pts = frame.pts
+        new_frame.dts = frame.dts
         return new_frame
 
 

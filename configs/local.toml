@@ -13,9 +13,6 @@ static_directory = "app/static"
 [Templates]
 temp_directory= "app/templates"
 
-[Certificates]
-cert_directory = "/home/dogan/cert.pem"
-key_directory = "/home/dogan/key.pem"
 
 [Logging]
 log_file = "logs/app.log"
