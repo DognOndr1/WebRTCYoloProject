@@ -74,44 +74,25 @@ button{
 }
 
 #remoteVideo {
-    width: 720px;
-    height: 540px;
-}
-#video_feed{
     width: 640px;
     height: 480px;
-    aspect-ratio: 4/3;
 }
 
-.detector-section{
-    aspect-ratio: 4/3;
-}
 
 @media (max-width: 770px) {
     #remoteVideo {
         width: 480px;
         height: 360px;
-    }
-    #video_feed{
-        width: 480px;
-        height: 360px;
+        
     }
 }
 @media (max-width: 500px) {
     #remoteVideo {
-        width: 345px;
-        height: 260px;
+        width: 350px;
     }
-
-    #video_feed{
-        width: 345px;
-        height: 260px;
-    }
-
     .controls{
         gap: 3px;
     }
-    
 }
 .log-info {
     color: #fff;
@@ -130,7 +111,3 @@ button{
     flex-direction: column;
 }
 
-.detector-section{
-    display: flex;
-    flex-direction: column;
-}

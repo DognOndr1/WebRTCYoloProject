@@ -12,7 +12,7 @@ from aiortc import (
 )
 from av import VideoFrame
 from aiortc.contrib.media import MediaRelay
-import cv2
+import cv2,os
 import numpy as np
 
 if __name__ == "__main__":
@@ -23,7 +23,6 @@ else:
     from app.detector import Detector
     from app.webapp import WebServer
     from app.decorater import check_active_decorator
-
 
 @dataclass
 class AIOHTTPWeb(WebServer):
@@ -74,6 +73,12 @@ class AIOHTTPWeb(WebServer):
                 await pc.close()
                 del self.pcs[sid]
 
+        @self.sio.on("canvas_size")
+        async def handle_size(sid,data):
+            width = data['width']
+            height = data['height']
+            print(f"width: {width}, height: {height}")
+
         @self.sio.on("sdp")
         async def handle_sdp(sid, data):
             if sid in self.pcs:
@@ -84,7 +89,6 @@ class AIOHTTPWeb(WebServer):
                             iceServers=[RTCIceServer("stun:stun.l.google.com:19302")]
                         )
                     )
-
                     self.pcs[sid] = pc
             else:
                 pc = RTCPeerConnection(
@@ -92,7 +96,6 @@ class AIOHTTPWeb(WebServer):
                         iceServers=[RTCIceServer("stun:stun.l.google.com:19302")]
                     )
                 )
-
                 self.pcs[sid] = pc
 
             offer = RTCSessionDescription(sdp=data["sdp"], type=data["type"])
@@ -103,7 +106,7 @@ class AIOHTTPWeb(WebServer):
             def on_track(track):
                 print(f"Track received: {track.kind}")
                 if track.kind == "video":
-                    gray_track = GrayVideoStreamTrack(self.relay.subscribe(track))
+                    gray_track = GrayVideoStreamTrack(self.relay.subscribe(track), self.sio, sid=sid)
                     print("Track added to pc")
                     pc.addTrack(gray_track)
 
@@ -168,6 +171,8 @@ class AIOHTTPWeb(WebServer):
         self.app.router.add_get("/framework", get_framework)
         self.register_socket_events()
 
+        self.ssl_cert = os.path.join(module_directory, "..","cert.pem")
+        self.ssl_key = os.path.join(module_directory, "..","key.pem")
         ssl_context = None
         if self.ssl_cert and self.ssl_key:
             ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
@@ -179,25 +184,43 @@ class AIOHTTPWeb(WebServer):
     def run(self):
         self.server()
 
-
 class GrayVideoStreamTrack(VideoStreamTrack):
-    def __init__(self, track):
+    def __init__(self, track, sio, sid):
         super().__init__()
         self.track = track
         self.detector = Detector()
+        self.sio = sio
+        self.sid = sid
+        self.original_width = None
+        self.original_height = None
 
     async def recv(self):
-        frame = await self.track.recv()  # Alınan çerçeve
+        frame = await self.track.recv()
         if not isinstance(frame, VideoFrame):
             raise ValueError("Frame is not a VideoFrame")
 
-        # Convert frame to numpy array
         img = np.array(frame.to_ndarray(format="bgr24"))
 
-        # Process frame using detector
-        processed_frame = self.detector.process_frame(img)
+        if self.original_width is None or self.original_height is None:
+            self.original_width = img.shape[1]
+            self.original_height = img.shape[0]
 
-        # Convert processed frame back to VideoFrame
+        processed_frame, detections = self.detector.process_frame(img)
+
+        if detections:
+            for detection in detections:
+                detection['sid'] = self.sid
+
+            data_to_send = {
+                'detections': detections,
+                'original_width': self.original_width,
+                'original_height': self.original_height
+            }
+            
+            await self.sio.emit('detections', json.dumps(data_to_send))
+        else:
+            print("No detections found")
+        
         if processed_frame is None or not isinstance(processed_frame, np.ndarray):
             raise ValueError("Processed frame is None or not a numpy array")
 
@@ -206,7 +229,6 @@ class GrayVideoStreamTrack(VideoStreamTrack):
         new_frame.pts = frame.pts
         new_frame.dts = frame.dts
         return new_frame
-
 
 def parse_candidate(candidate_str):
     parts = candidate_str.split()
@@ -220,9 +242,12 @@ def parse_candidate(candidate_str):
         "type": parts[7],
     }
 
-
 if __name__ == "__main__":
-    web_server = AIOHTTPWeb(
+    module_directory = os.path.dirname(os.path.abspath(__file__))
+    ssl_cert = os.path.join(module_directory, "cert.pem")
+    ssl_key = os.path.join(module_directory, "key.pem")
+
+    aiohttpserver = AIOHTTPWeb(
         host="0.0.0.0",
         port=8000,
         is_active=True,
@@ -231,8 +256,8 @@ if __name__ == "__main__":
         temp_directory="templates",
         logger=None,
         pcs={},
-        ssl_cert="/home/dogan/cert.pem",  # Add path to your SSL certificate
-        ssl_key="/home/dogan/key.pem",  # Add path to your SSL private key
+        ssl_cert=ssl_cert,  
+        ssl_key=ssl_key,  
     )
 
-    web_server.run()
+    aiohttpserver.run()

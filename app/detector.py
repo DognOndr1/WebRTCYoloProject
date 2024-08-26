@@ -49,7 +49,7 @@ class Detector:
         if processed_frame is None:
             return None
 
-        return processed_frame
+        return processed_frame, detections
 
     # def generate_frames(self, frame):
     #     processed_frame, detections = self.process_frame(frame)
@@ -67,6 +67,3 @@ class Detector:
     #         b"--frame\r\n"
     #         b"Content-Type: image/jpeg\r\n\r\n" + frame_bytes + b"\r\n"
     #     )
-
-
-

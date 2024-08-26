@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from typing import Any
 import uvicorn, cv2
 from fastapi.responses import JSONResponse
-import cv2
+import cv2,os
 import numpy as np
 
 from aiortc import (
@@ -101,10 +101,10 @@ class FastAPIWebServer(WebServer):
             def on_track(track):
                 self.logger.info(f"Track received {track.kind}")
                 if track.kind == "video":
-                    print("Gray Track Mesajı")
-                    gray_track = GrayVideoStreamTrack(self.relay.subscribe(track))
+                    print("Object Track Mesajı")
+                    object_track = ObjectDetection(self.relay.subscribe(track),self.sio,sid=sid)
                     self.logger.info("Track added to PC")
-                    pc.addTrack(gray_track)
+                    pc.addTrack(object_track)
 
             await pc.setRemoteDescription(offer)
             answer = await pc.createAnswer()
@@ -156,6 +156,13 @@ class FastAPIWebServer(WebServer):
             else:
                 print(f"No RTCPeerConnection found for sid: {sid}")
 
+        self.ssl_cert = os.path.join(module_directory, "..", "cert.pem")
+        self.ssl_key = os.path.join(module_directory, "..", "key.pem")
+        ssl_context = None
+        if self.ssl_cert and self.ssl_key:
+            ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+            ssl_context.load_cert_chain(certfile=self.ssl_cert, keyfile=self.ssl_key)
+
         ssl_context = None
         if self.ssl_cert and self.ssl_key:
             ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
@@ -175,20 +182,42 @@ class FastAPIWebServer(WebServer):
         self.server()
 
 
-class GrayVideoStreamTrack(VideoStreamTrack):
-    def __init__(self, track):
+class ObjectDetection(VideoStreamTrack):
+    def __init__(self, track, sio, sid):
         super().__init__()
         self.track = track
         self.detector = Detector()
+        self.sio = sio
+        self.sid = sid
+        self.original_width = None
+        self.original_height = None
 
     async def recv(self):
-        frame = await self.track.recv()  # Alınan çerçeve
+        frame = await self.track.recv()
         if not isinstance(frame, VideoFrame):
             raise ValueError("Frame is not a VideoFrame")
 
         img = np.array(frame.to_ndarray(format="bgr24"))
 
-        processed_frame = self.detector.process_frame(img)
+        if self.original_width is None or self.original_height is None:
+            self.original_width = img.shape[1]
+            self.original_height = img.shape[0]
+
+        processed_frame, detections = self.detector.process_frame(img)
+
+        if detections:
+            for detection in detections:
+                detection['sid'] = self.sid
+
+            data_to_send = {
+                'detections': detections,
+                'original_width': self.original_width,
+                'original_height': self.original_height
+            }
+            
+            await self.sio.emit('detections', json.dumps(data_to_send))
+        else:
+            print("No detections found")
         
         if processed_frame is None or not isinstance(processed_frame, np.ndarray):
             raise ValueError("Processed frame is None or not a numpy array")
@@ -198,6 +227,7 @@ class GrayVideoStreamTrack(VideoStreamTrack):
         new_frame.pts = frame.pts
         new_frame.dts = frame.dts
         return new_frame
+
 
 
 def parse_candidate(candidate_str):
@@ -229,6 +259,9 @@ if __name__ == "__main__":
         "log_format": "<green>{time:MMM D, YYYY - HH:mm:ss}</green> || <level>{level}</level> || <red>{file.name}</red> || <cyan>{message}</cyan>||",
         "rotation": "10MB",
     }
+    module_directory = os.path.dirname(os.path.abspath(__file__))
+    ssl_cert = os.path.join(module_directory, "..", "cert.pem")
+    ssl_key = os.path.join(module_directory, "..", "key.pem")
 
     fastapiweb = FastAPIWebServer(
         "0.0.0.0",
@@ -238,8 +271,9 @@ if __name__ == "__main__":
         static_directory="static",
         temp_directory="templates",
         logger=Logger(**logger_configs),
-        ssl_cert="/home/dogan/cert.pem",
-        ssl_key="/home/dogan/key.pem",
+        ssl_cert=ssl_cert,
+        ssl_key=ssl_key,
     )
+    
 
     fastapiweb.run()

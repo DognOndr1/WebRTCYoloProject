@@ -1,6 +1,4 @@
-/*
-    * -----------------------------------------------------------------------STUN / TURN Sunucuları Ayarlanıyor --------------------------------------------------------------------
-*/
+// STUN / TURN Sunucuları Ayarlanıyor
 const config = {
     iceServers: [
         {
@@ -9,10 +7,7 @@ const config = {
     ]
 };
 
-
-/*
-    * -----------------------------------------------------------------------Kullanılacak Medya Akışları Belirleniyor --------------------------------------------------------------------
-*/
+// Kullanılacak Medya Akışları Belirleniyor
 const constraints = {
     video: { deviceId: undefined }, 
     audio: false
@@ -23,76 +18,16 @@ let socket = null;
 let stream = null;
 let isStreaming = false;
 
-
-/*
-    * -----------------------------------------------------------------------HTML Elementleri ALınıyor --------------------------------------------------------------------
-*/
+// HTML Elementleri Alınıyor
 const startBtn = document.querySelector("button#startButton");
 const stopBtn = document.querySelector("button#stopButton");
 const remoteVideo = document.querySelector("video#remoteVideo");
 const logsContainer = document.querySelector(".logs");
 const toggleButton = document.querySelector("#toggleButton");
 const deviceSelect = document.getElementById("devices");
-const detectorBtn = document.querySelector(".detector-btn");
-const video_feed = document.querySelector("#video_feed")
-const detectorSection = document.querySelector(".detector-section")
-const videoSection = document.querySelector(".video-sec");
-const videoFeed = document.querySelector("#video_feed");
 
 
-/*
-    * -----------------------------------------------------------------------Obje Tespiti Buton Ayarları --------------------------------------------------------------------
-*/
-document.querySelector(".detector-btn").addEventListener("click", function(){
-/*
-    * -------------------------------------------------------------Buton İçindeki Yazıya Göre Buton İşlevi Belirleniyor --------------------------------------------------------------------
-*/
-    if (detectorBtn.innerHTML === "Start") {
-        // Start işlemi
-        fetch('/start', {
-            method: 'GET'
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            videoFeed.src = "/video_feed";
-        })
-        .then(() => startB())
-        .catch(error => console.log('Error: ' + error));
-    } else {
-        // Stop işlemi
-        fetch('/stop', {
-            method: 'GET'
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            videoFeed.src = ""; // Video akışını durdurmak için src'yi boş yapıyoruz
-        })
-        .then(() => stopB())
-        .catch(error => console.log('Error: ' + error));
-    }
-});
-
-function startB(){
-    detectorBtn.innerHTML = "Stop";
-    detectorBtn.classList.add("bg-danger");
-    detectorBtn.classList.remove("bg-dark");
-}
-
-function stopB(){
-    detectorBtn.innerHTML = "Start";
-    detectorBtn.classList.remove("bg-danger");
-    detectorBtn.classList.add("bg-dark");
-}
-
-
-/*
-    * ----------------------------------------------------------Kullanılarn Frameworke Göre Arayüz Ayarlanıyor --------------------------------------------------------------------
-*/
-
+// Kullanılan Framework'e Göre Arayüz Ayarlanıyor
 fetch('/framework')
     .then(response => response.json())
     .then(data => {
@@ -102,22 +37,15 @@ fetch('/framework')
 
 function setUIForFramework(framework) {
     if (framework === 'aiohttp' || framework === 'fastapi') {
-        videoSection.style.display = 'flex'; 
-        videoSection.style.flexDirection = 'column'; 
-        detectorSection.style.display = "none"; 
         connectSocket();
         getConnectedDevices();
     } else {
-        log("Fast or Flask selected");
-        videoSection.style.display = 'none';
-        detectorSection.style.justifyContent = "center"
+        log("Fast selected");
+
     }
 }
 
-
-/*
-    * ---------------------------------------------------------------Filtre Butonu CSS Özellikleri Ayarlanıyor --------------------------------------------------------------------
-*/
+// Filtre Butonu CSS Özellikleri Ayarlanıyor
 async function toggleStream() {
     if (isStreaming) {
         await stop();
@@ -132,15 +60,39 @@ async function toggleStream() {
     }
 }
 
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
 
-/*
-    * ----------------------------------------------------------------------Socket IO Ayarları Yapılıyor --------------------------------------------------------------------
-*/
+function updateCanvasSize() {
+    const videoRect = remoteVideo.getBoundingClientRect();
+    const videoWidth = videoRect.width;
+    const videoHeight = videoRect.height;
+    
+    if (videoWidth === 0 || videoHeight === 0) return;
+
+    canvas.width = videoWidth;
+    canvas.height = videoHeight;
+    canvas.style.width = videoWidth + 'px';
+    canvas.style.height = videoHeight + 'px';
+    console.log("Canvas size updated:", canvas.width, canvas.height);
+    socket.emit('canvas_size', {width: canvas.width, height: canvas.height})
+}
+
+
+window.addEventListener('resize', updateCanvasSize);
+
+remoteVideo.onloadedmetadata = () => {
+    updateCanvasSize();
+};
+
+let mySID = null;
+
 function connectSocket() {
     socket = io(); 
 
     socket.on('connect', () => {
-        log('Connected to server');
+        mySID = socket.id; 
+        console.log("My SID:", mySID);
     });
 
     socket.on('disconnect', () => {
@@ -167,12 +119,49 @@ function connectSocket() {
             log("Error setting remote description: " + error, 'error');
         }
     });
+
+    socket.on('detections', (data) => {
+        try {
+            const parsedData = JSON.parse(data);
+            const detectionsArray = parsedData.detections;
+            const originalWidth = parsedData.original_width;
+            const originalHeight = parsedData.original_height;
+    
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+            const scaleX = canvas.width / originalWidth;
+            const scaleY = canvas.height / originalHeight;
+    
+            detectionsArray.forEach(detection => {
+                if (detection.sid === mySID) {
+                    const { bounding_box, confidence, class_id } = detection;
+                    let { x1, y1, x2, y2 } = bounding_box;
+    
+                    x1 *= scaleX;
+                    y1 *= scaleY;
+                    x2 *= scaleX;
+                    y2 *= scaleY;
+    
+                    ctx.strokeStyle = 'blue';
+                    ctx.lineWidth = 2;
+    
+                    ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
+    
+                    ctx.font = '16px Arial';
+                    ctx.fillStyle = 'red';
+    
+                    const text = `ID: ${class_id} Confidence: ${confidence.toFixed(2)}`;
+                    ctx.fillText(text, x1, y1 > 10 ? y1 - 10 : y1 + 20);
+                }
+            });
+        } catch (error) {
+            console.error('Error parsing detections:', error);
+        }
+    });
+    
 }
 
-
-/*
-    * -----------------------------------------------------------------------WebRTC İşlemleri Yapılıyor--------------------------------------------------------------------
-*/
+// WebRTC İşlemleri Yapılıyor
 async function getMedia(deviceId) {
     try {
         if (stream) {
@@ -188,15 +177,9 @@ async function getMedia(deviceId) {
         stream = await navigator.mediaDevices.getUserMedia(constraints);
         pc = new RTCPeerConnection(config);
 
-        pc.onicecandidate = (event) => {
-            if (event.candidate) {
-                log("New ICE candidate: " + JSON.stringify(event.candidate));
-                socket.emit('ice_candidate', {
-                    sdpMid: event.candidate.sdpMid,
-                    sdpMLineIndex: event.candidate.sdpMLineIndex,
-                    candidate: event.candidate.candidate
-                });
-            }
+        remoteVideo.srcObject = stream;
+        remoteVideo.onloadedmetadata = () => {
+            updateCanvasSize();
         };
 
         pc.oniceconnectionstatechange = () => {
@@ -207,7 +190,6 @@ async function getMedia(deviceId) {
             const incomingStream = event.streams[0];
             if (incomingStream) {
                 if (remoteVideo.srcObject !== incomingStream) {
-                    remoteVideo.srcObject = incomingStream;
                     log("Remote video stream set");
                 }
             } else {
@@ -228,22 +210,17 @@ async function getMedia(deviceId) {
     }
 }
 
-
-/*
-    * -----------------------------------------------------------------------Bağlı ve Dahili Medya Cihazları --------------------------------------------------------------------
-*/
 function getConnectedDevices() {
     navigator.mediaDevices.enumerateDevices()
     .then(devices => {
         const filtered = devices.filter(device => device.kind === 'videoinput');
-        deviceSelect.innerHTML = ''; // Clear existing options
+        deviceSelect.innerHTML = ''; 
         filtered.forEach(device => {
             addOptionToSelect(device.label || `Camera ${filtered.indexOf(device) + 1}`, device.deviceId);
         });
     });
 }
 
-///////////////////////
 function addOptionToSelect(optionText, optionValue) {
     const option = document.createElement("option");
     option.text = optionText;
@@ -251,10 +228,7 @@ function addOptionToSelect(optionText, optionValue) {
     deviceSelect.appendChild(option);
 }
 
-
-/*
-    * -----------------------------------------------------------------------HTML Elementleri ALınıyor --------------------------------------------------------------------
-*/
+// HTML Elementleri Alınıyor
 async function start() {
     try {
         if (pc) {
@@ -289,19 +263,14 @@ function stop() {
 
     remoteVideo.srcObject = null;
     log("Video stream stopped");
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
-
-
-
 
 toggleButton.addEventListener("click", toggleStream);
 
 log("Script loaded. Click the start button to begin.");
 
-/*
-    * -----------------------------------------------------------------------HTML Elementleri ALınıyor --------------------------------------------------------------------
-*/
-
+// Log Fonksiyonu
 function log(message, level = 'info') {
     console.log(message);
 

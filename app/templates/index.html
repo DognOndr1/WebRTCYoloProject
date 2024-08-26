@@ -18,12 +18,25 @@
         }
         .navbar-1{
             -webkit-box-shadow: 0px 21px 116px -35px rgba(0,0,0,0.75);
--moz-box-shadow: 0px 21px 116px -35px rgba(0,0,0,0.75);
-box-shadow: 0px 21px 116px -35px rgba(0,0,0,0.75);
+            -moz-box-shadow: 0px 21px 116px -35px rgba(0,0,0,0.75);
+            box-shadow: 0px 21px 116px -35px rgba(0,0,0,0.75);
         }
+
+        #canvas{
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        #video-container{
+            position: relative;
+        }
+
+
+        
     </style>
 </head>
-<body>
+<body onload="updateCanvasSize()">
     <div class="relative">
         <!-- Header -->
         <header class="d-flex justify-content-center align-items-center navbar-1" style="height: 90px;">
@@ -38,9 +51,11 @@ box-shadow: 0px 21px 116px -35px rgba(0,0,0,0.75);
                 <h3 class="text-light font-weight-bold">WebRTC - Gray Filter</h3>
                 
                 <!-- Video Display -->
-                <video id="remoteVideo" autoplay class="bg-dark mb-3 border rounded"></video>
-
-                
+                <div id="video-container" class="d-flex justify-content-center align-items-center">
+                    <video id="remoteVideo" autoplay class="bg-dark mb-3 border rounded"></video>
+                    <canvas id="canvas"></canvas>
+                </div>
+    
                 <!-- Controls -->
                 <div class="btn-sec d-flex controls" style="gap: 3rem;">
                     <button id="toggleButton" class="btn btn-dark py-2 px-4 border-0">Start Video</button>
@@ -49,20 +64,11 @@ box-shadow: 0px 21px 116px -35px rgba(0,0,0,0.75);
                         <option value="">Select A Camera</option>
                     </select>
                 </div>
-                <hr class="bg-dark" style="height: 1px; width: 100vw;">
                 <!-- Logs Section -->
                 <div class="my-5 container">
                     <h2 class="text-light">Logs</h2>
                     <div class="logs p-3 bg-dark text-light overflow-auto" style=" height: 200px; white-space: pre-wrap; word-wrap: break-word;"></div>
                 </div>
-            </div>
-            <div class="detector-section justify-content-center align-items-center mt-3 rounded">
-                <h1 class="text-light ">Object-Detection</h1>
-                <div class="video_feed_background p-2 bg-dark">
-                    <img id="video_feed" src="/video_feed"  alt="" class="bg-light border-0">
-                </div>
-                <button class="detector-btn bg-dark px-3 border-0 text-light p-3 rounded mt-3" style="width:85px;">Start</button>
-
             </div>
         </main>
 
