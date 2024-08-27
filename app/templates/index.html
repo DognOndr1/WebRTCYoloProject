@@ -36,7 +36,7 @@
         
     </style>
 </head>
-<body onload="updateCanvasSize()">
+<body onload="updateCanvasSize(),responsiveVideo()">
     <div class="relative">
         <!-- Header -->
         <header class="d-flex justify-content-center align-items-center navbar-1" style="height: 90px;">
@@ -52,7 +52,7 @@
                 
                 <!-- Video Display -->
                 <div id="video-container" class="d-flex justify-content-center align-items-center">
-                    <video id="remoteVideo" autoplay class="bg-dark mb-3 border rounded"></video>
+                    <video autoplay class="bg-dark mb-3 border rounded remoteVideo"></video>
                     <canvas id="canvas"></canvas>
                 </div>
     
@@ -65,7 +65,7 @@
                     </select>
                 </div>
                 <!-- Logs Section -->
-                <div class="my-5 container">
+                <div class="my-5 container log-container">
                     <h2 class="text-light">Logs</h2>
                     <div class="logs p-3 bg-dark text-light overflow-auto" style=" height: 200px; white-space: pre-wrap; word-wrap: break-word;"></div>
                 </div>

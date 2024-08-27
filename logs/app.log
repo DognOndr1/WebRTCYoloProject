@@ -4948,3 +4948,24 @@ Aug 19, 2024 - 17:30:24 || INFO || Client disconnected:  Tn9upSYGhuiKwaX6AAAD ||
 Aug 19, 2024 - 17:30:24 || INFO || Client disconnected:  Tr15cdbaNMqEIih_AAAF || fastapiweb.py ||75
 Aug 19, 2024 - 17:30:24 || INFO || Client disconnected:  LRXezknVajEFNYe_AAAB || fastapiweb.py ||75
 Aug 22, 2024 - 10:42:29 || INFO || FastAPI started || fastapiweb.py ||157
+Aug 27, 2024 - 11:09:17 || ERROR || Server failed to start: name 'module_directory' is not defined || main.py ||46
+Aug 27, 2024 - 11:11:07 || ERROR || Server failed to start: name 'module_directory' is not defined || main.py ||48
+Aug 27, 2024 - 11:12:15 || INFO || FastAPI started || fastapiweb.py ||173
+Aug 27, 2024 - 11:12:16 || INFO || New Client Connected to This id : Uf7yEWYdmXCwFWoxAAAB || fastapiweb.py ||71
+Aug 27, 2024 - 11:12:18 || INFO || New Client Connected to This id : MRUlWUp5HGxvHbdVAAAD || fastapiweb.py ||71
+Aug 27, 2024 - 11:12:19 || INFO || New Client Connected to This id : A_eVM7eqYJq3s4R_AAAF || fastapiweb.py ||71
+Aug 27, 2024 - 11:12:21 || INFO || Received SDP offer || fastapiweb.py ||97
+Aug 27, 2024 - 11:12:21 || INFO || Track received video || fastapiweb.py ||102
+Aug 27, 2024 - 11:12:21 || INFO || Track added to PC || fastapiweb.py ||106
+Aug 27, 2024 - 11:12:33 || INFO || Received SDP offer || fastapiweb.py ||97
+Aug 27, 2024 - 11:12:33 || INFO || Track received video || fastapiweb.py ||102
+Aug 27, 2024 - 11:12:33 || INFO || Track added to PC || fastapiweb.py ||106
+Aug 27, 2024 - 11:12:35 || INFO || Received SDP offer || fastapiweb.py ||97
+Aug 27, 2024 - 11:12:35 || INFO || Track received video || fastapiweb.py ||102
+Aug 27, 2024 - 11:12:35 || INFO || Track added to PC || fastapiweb.py ||106
+Aug 27, 2024 - 11:13:20 || INFO || Client disconnected:  Uf7yEWYdmXCwFWoxAAAB || fastapiweb.py ||79
+Aug 27, 2024 - 11:13:21 || INFO || Client disconnected:  MRUlWUp5HGxvHbdVAAAD || fastapiweb.py ||79
+Aug 27, 2024 - 11:13:45 || INFO || New Client Connected to This id : P2_EG8LGgEv9dRQ4AAAH || fastapiweb.py ||71
+Aug 27, 2024 - 11:14:01 || INFO || Client disconnected:  A_eVM7eqYJq3s4R_AAAF || fastapiweb.py ||79
+Aug 27, 2024 - 11:14:01 || INFO || Client disconnected:  P2_EG8LGgEv9dRQ4AAAH || fastapiweb.py ||79
+Aug 27, 2024 - 11:14:12 || ERROR || Server failed to start: name 'module_directory' is not defined || main.py ||47

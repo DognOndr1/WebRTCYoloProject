@@ -156,6 +156,8 @@ class FastAPIWebServer(WebServer):
             else:
                 print(f"No RTCPeerConnection found for sid: {sid}")
 
+
+        module_directory = os.path.dirname(os.path.abspath(__file__))
         self.ssl_cert = os.path.join(module_directory, "..", "cert.pem")
         self.ssl_key = os.path.join(module_directory, "..", "key.pem")
         ssl_context = None

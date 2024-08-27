@@ -73,12 +73,6 @@ class AIOHTTPWeb(WebServer):
                 await pc.close()
                 del self.pcs[sid]
 
-        @self.sio.on("canvas_size")
-        async def handle_size(sid,data):
-            width = data['width']
-            height = data['height']
-            print(f"width: {width}, height: {height}")
-
         @self.sio.on("sdp")
         async def handle_sdp(sid, data):
             if sid in self.pcs:
@@ -170,7 +164,8 @@ class AIOHTTPWeb(WebServer):
         self.app.router.add_get("/", home)
         self.app.router.add_get("/framework", get_framework)
         self.register_socket_events()
-
+        
+        module_directory = os.path.dirname(os.path.abspath(__file__))
         self.ssl_cert = os.path.join(module_directory, "..","cert.pem")
         self.ssl_key = os.path.join(module_directory, "..","key.pem")
         ssl_context = None

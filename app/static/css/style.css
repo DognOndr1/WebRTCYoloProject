@@ -73,27 +73,43 @@ button{
     "Poppins", sans-serif;
 }
 
-#remoteVideo {
+
+
+.log-container{
+    max-width: 100vw;
+}
+
+/* Mobil ve masaüstü cihazlar arasında boyutlandırma için sınıf tanımları */
+.remoteVideoDesktop {
     width: 640px;
     height: 480px;
 }
 
 
+/* Farklı ekran boyutları için media sorguları */
 @media (max-width: 770px) {
-    #remoteVideo {
+    .remoteVideoDesktop {
         width: 480px;
         height: 360px;
-        
     }
 }
+
 @media (max-width: 500px) {
-    #remoteVideo {
-        width: 350px;
+    .remoteVideoDesktop {
+        width: 319px;
+        height: 240px;
     }
-    .controls{
+
+    .remoteVideoMobile {
+        width: 360px;
+        height: 480px;
+    }
+
+    .controls {
         gap: 3px;
     }
 }
+
 .log-info {
     color: #fff;
 }

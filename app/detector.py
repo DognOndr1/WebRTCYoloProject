@@ -41,8 +41,6 @@ class Detector:
                 }
 
                 detections.append(detection)
-        
-                # print(f"Sınıf: {class_id}, Güven: {confidence:.2f}, Bounding Box: x1={x1:.0f}, y1={y1:.0f}, x2={x2:.0f}, y2={y2:.0f}")
 
         processed_frame = results[0].plot()
 
@@ -50,20 +48,3 @@ class Detector:
             return None
 
         return processed_frame, detections
-
-    # def generate_frames(self, frame):
-    #     processed_frame, detections = self.process_frame(frame)
-    #     if processed_frame is None:
-    #         return
-        
-    #     success, buffer = cv2.imencode(".jpg", processed_frame)
-    #     if not success:
-    #         return
-    #     frame_bytes = buffer.tobytes()
-        
-
-    #     json_data = json.dumps(detections)
-    #     yield (
-    #         b"--frame\r\n"
-    #         b"Content-Type: image/jpeg\r\n\r\n" + frame_bytes + b"\r\n"
-    #     )

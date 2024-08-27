@@ -17,11 +17,20 @@ let pc = null;
 let socket = null;
 let stream = null;
 let isStreaming = false;
+let deviceType = getDeviceType();
+
+function getDeviceType() {
+    const ua = navigator.userAgent;
+    if (/mobile/i.test(ua)) {
+        return 'mobile';
+    }
+    return 'desktop';
+}
 
 // HTML Elementleri Alınıyor
 const startBtn = document.querySelector("button#startButton");
 const stopBtn = document.querySelector("button#stopButton");
-const remoteVideo = document.querySelector("video#remoteVideo");
+const remoteVideo = document.querySelector("video.remoteVideo");
 const logsContainer = document.querySelector(".logs");
 const toggleButton = document.querySelector("#toggleButton");
 const deviceSelect = document.getElementById("devices");
@@ -61,7 +70,7 @@ async function toggleStream() {
 }
 
 const canvas = document.getElementById('canvas');
-const ctx = canvas.getContext('2d');
+let ctx = canvas.getContext('2d');
 
 function updateCanvasSize() {
     const videoRect = remoteVideo.getBoundingClientRect();
@@ -135,6 +144,12 @@ function connectSocket() {
             detectionsArray.forEach(detection => {
                 if (detection.sid === mySID) {
                     const { bounding_box, confidence, class_id } = detection;
+    
+                    
+                    if (confidence < 0.40) {
+                        return;
+                    }
+    
                     let { x1, y1, x2, y2 } = bounding_box;
     
                     x1 *= scaleX;
@@ -146,8 +161,17 @@ function connectSocket() {
                     ctx.lineWidth = 2;
     
                     ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
+
+
+                    if(deviceType == "mobile"){
+                        ctx.font = '12px Arial';
+                        ctx.lineWidth = 1;
+                    }else{
+                        ctx.font = '16px Arial';
+                        ctx.lineWidth = 2;
+                    }
     
-                    ctx.font = '16px Arial';
+                    
                     ctx.fillStyle = 'red';
     
                     const text = `ID: ${class_id} Confidence: ${confidence.toFixed(2)}`;
@@ -158,8 +182,23 @@ function connectSocket() {
             console.error('Error parsing detections:', error);
         }
     });
-    
 }
+
+
+function responsiveVideo(){
+    if (deviceType == "mobile") {
+        remoteVideo.classList.remove("remoteVideoDesktop");
+        remoteVideo.classList.add("remoteVideoMobile");
+        
+    } else {
+        remoteVideo.classList.remove("remoteVideoMobile");
+        remoteVideo.classList.add("remoteVideoDesktop");
+    }
+}
+
+responsiveVideo()
+
+
 
 // WebRTC İşlemleri Yapılıyor
 async function getMedia(deviceId) {
