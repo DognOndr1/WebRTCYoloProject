@@ -35,25 +35,6 @@ const logsContainer = document.querySelector(".logs");
 const toggleButton = document.querySelector("#toggleButton");
 const deviceSelect = document.getElementById("devices");
 
-
-// Kullanılan Framework'e Göre Arayüz Ayarlanıyor
-fetch('/framework')
-    .then(response => response.json())
-    .then(data => {
-        setUIForFramework(data.framework);
-    })
-    .catch(error => log('Error: ' + error, 'error'));
-
-function setUIForFramework(framework) {
-    if (framework === 'aiohttp' || framework === 'fastapi') {
-        connectSocket();
-        getConnectedDevices();
-    } else {
-        log("Fast selected");
-
-    }
-}
-
 // Filtre Butonu CSS Özellikleri Ayarlanıyor
 async function toggleStream() {
     if (isStreaming) {
@@ -83,8 +64,7 @@ function updateCanvasSize() {
     canvas.height = videoHeight;
     canvas.style.width = videoWidth + 'px';
     canvas.style.height = videoHeight + 'px';
-    console.log("Canvas size updated:", canvas.width, canvas.height);
-    socket.emit('canvas_size', {width: canvas.width, height: canvas.height})
+
 }
 
 
@@ -331,3 +311,65 @@ function log(message, level = 'info') {
     logsContainer.appendChild(logEntry);
     logsContainer.scrollTop = logsContainer.scrollHeight;
 }
+
+
+async function cameraPermission() {
+    const result = await navigator.permissions.query({name: "camera"})
+
+    if(result.state === "granted"){
+        getConnectedDevices()
+    }else{
+        StartVideoForPerm()
+        getConnectedDevices()
+    }
+}
+
+async function StartVideoForPerm() {
+    try{
+        const stream = await navigator.mediaDevices.getUserMedia({'video': true})
+        stream.getTracks().forEach(track => track.stop())
+    }catch{
+        console.log("Error: " + error)
+    }
+}
+
+connectSocket()
+
+
+
+// Tarayıcının kullanıcı aracısı bilgisini al
+const userAgent = navigator.userAgent;
+
+// Tarayıcının adı ve versiyonunu bulmak için bir fonksiyon
+function getBrowserInfo() {
+    if (userAgent.indexOf("Firefox") > -1) {
+        return "Mozilla Firefox";
+    } else if (userAgent.indexOf("SamsungBrowser") > -1) {
+        return "Samsung Internet";
+    } else if (userAgent.indexOf("Opera") > -1 || userAgent.indexOf("OPR") > -1) {
+        return "Opera";
+    } else if (userAgent.indexOf("Trident") > -1) {
+        return "Internet Explorer";
+    } else if (userAgent.indexOf("Edge") > -1) {
+        return "Microsoft Edge";
+    } else if (userAgent.indexOf("Chrome") > -1) {
+        return "Google Chrome";
+    } else if (userAgent.indexOf("Safari") > -1) {
+        return "Safari";
+    } else {
+        return "Bilinmeyen Tarayıcı";
+    }
+}
+
+if(getBrowserInfo() == "Google Chrome"){
+    cameraPermission()
+}
+else if(getBrowserInfo() == "Mozilla Firefox"){
+    StartVideoForPerm()
+    getConnectedDevices()
+}
+
+
+
+
+
