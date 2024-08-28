@@ -9,7 +9,7 @@ class Detector:
 
     def __post_init__(self):
         self.model = YOLO("yolov8n.pt")
-
+        self.class_names = self.model.names
     def process_frame(self, frame):
         if frame is None:
             return None
@@ -27,10 +27,12 @@ class Detector:
 
                 x1,y1,x2,y2 = box.xyxy[0]
                 class_id = int(box.cls[0])
+                class_name = self.class_names[class_id]
                 confidence = float(box.conf[0])
 
                 detection = {
                     "class_id": class_id,
+                    "class_name": class_name,
                     "confidence": confidence,
                     "bounding_box": {
                         "x1": int(x1),
@@ -41,6 +43,8 @@ class Detector:
                 }
 
                 detections.append(detection)
+
+                print(f"Class Name : {class_name}")
 
         processed_frame = results[0].plot()
 

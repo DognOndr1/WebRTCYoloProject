@@ -76,7 +76,7 @@ button{
 
 
 .log-container{
-    max-width: 100vw;
+    min-width: 65vw;
 }
 
 /* Mobil ve masaüstü cihazlar arasında boyutlandırma için sınıf tanımları */

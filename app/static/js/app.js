@@ -1,4 +1,4 @@
-// STUN / TURN Sunucuları Ayarlanıyor
+// !----------------------------------------------------------------STUN / TURN Sunucuları Ayarlanıyor----------------------------------------------------------------
 const config = {
     iceServers: [
         {
@@ -7,7 +7,7 @@ const config = {
     ]
 };
 
-// Kullanılacak Medya Akışları Belirleniyor
+// !----------------------------------------------------------------Kullanılacak Medya Akışları Belirleniyor----------------------------------------------------------------
 const constraints = {
     video: { deviceId: undefined }, 
     audio: false
@@ -19,6 +19,7 @@ let stream = null;
 let isStreaming = false;
 let deviceType = getDeviceType();
 
+// !----------------------------------------------------------------Cihaz Türünü Belirleme----------------------------------------------------------------
 function getDeviceType() {
     const ua = navigator.userAgent;
     if (/mobile/i.test(ua)) {
@@ -27,7 +28,7 @@ function getDeviceType() {
     return 'desktop';
 }
 
-// HTML Elementleri Alınıyor
+// !----------------------------------------------------------------HTML Elementleri Alınıyor----------------------------------------------------------------
 const startBtn = document.querySelector("button#startButton");
 const stopBtn = document.querySelector("button#stopButton");
 const remoteVideo = document.querySelector("video.remoteVideo");
@@ -35,7 +36,7 @@ const logsContainer = document.querySelector(".logs");
 const toggleButton = document.querySelector("#toggleButton");
 const deviceSelect = document.getElementById("devices");
 
-// Filtre Butonu CSS Özellikleri Ayarlanıyor
+// !---------------------------------------------------------------Filtre Butonu CSS Özellikleri Ayarlanıyor----------------------------------------------------------------
 async function toggleStream() {
     if (isStreaming) {
         await stop();
@@ -53,6 +54,7 @@ async function toggleStream() {
 const canvas = document.getElementById('canvas');
 let ctx = canvas.getContext('2d');
 
+// !----------------------------------------------------------------Canvas Boyutunu Güncelleme----------------------------------------------------------------
 function updateCanvasSize() {
     const videoRect = remoteVideo.getBoundingClientRect();
     const videoWidth = videoRect.width;
@@ -64,9 +66,7 @@ function updateCanvasSize() {
     canvas.height = videoHeight;
     canvas.style.width = videoWidth + 'px';
     canvas.style.height = videoHeight + 'px';
-
 }
-
 
 window.addEventListener('resize', updateCanvasSize);
 
@@ -76,6 +76,7 @@ remoteVideo.onloadedmetadata = () => {
 
 let mySID = null;
 
+// !----------------------------------------------------------------Socket Bağlantısını Yapma----------------------------------------------------------------
 function connectSocket() {
     socket = io(); 
 
@@ -123,9 +124,8 @@ function connectSocket() {
     
             detectionsArray.forEach(detection => {
                 if (detection.sid === mySID) {
-                    const { bounding_box, confidence, class_id } = detection;
+                    const { bounding_box, confidence, class_id, class_name } = detection;
     
-                    
                     if (confidence < 0.40) {
                         return;
                     }
@@ -142,19 +142,17 @@ function connectSocket() {
     
                     ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
 
-
-                    if(deviceType == "mobile"){
+                    if (deviceType === "mobile") {
                         ctx.font = '12px Arial';
                         ctx.lineWidth = 1;
-                    }else{
+                    } else {
                         ctx.font = '16px Arial';
                         ctx.lineWidth = 2;
                     }
     
-                    
                     ctx.fillStyle = 'red';
     
-                    const text = `ID: ${class_id} Confidence: ${confidence.toFixed(2)}`;
+                    const text = `ID: ${class_id}, ${class_name} Confidence: ${confidence.toFixed(2)}`;
                     ctx.fillText(text, x1, y1 > 10 ? y1 - 10 : y1 + 20);
                 }
             });
@@ -164,12 +162,11 @@ function connectSocket() {
     });
 }
 
-
-function responsiveVideo(){
-    if (deviceType == "mobile") {
+// !----------------------------------------------------------------Video Görünümünü Duyarlı Yapma----------------------------------------------------------------
+function responsiveVideo() {
+    if (deviceType === "mobile") {
         remoteVideo.classList.remove("remoteVideoDesktop");
         remoteVideo.classList.add("remoteVideoMobile");
-        
     } else {
         remoteVideo.classList.remove("remoteVideoMobile");
         remoteVideo.classList.add("remoteVideoDesktop");
@@ -178,9 +175,7 @@ function responsiveVideo(){
 
 responsiveVideo()
 
-
-
-// WebRTC İşlemleri Yapılıyor
+// !----------------------------------------------------------------WebRTC İşlemleri Yapılıyor----------------------------------------------------------------
 async function getMedia(deviceId) {
     try {
         if (stream) {
@@ -229,6 +224,7 @@ async function getMedia(deviceId) {
     }
 }
 
+// !----------------------------------------------------------------Bağlı Cihazları Alma--------------------------------------------------------------------------------------
 function getConnectedDevices() {
     navigator.mediaDevices.enumerateDevices()
     .then(devices => {
@@ -240,6 +236,7 @@ function getConnectedDevices() {
     });
 }
 
+// !---------------------------------------------------------------Select Öğesine Seçenek Ekleme----------------------------------------------------------------
 function addOptionToSelect(optionText, optionValue) {
     const option = document.createElement("option");
     option.text = optionText;
@@ -247,7 +244,7 @@ function addOptionToSelect(optionText, optionValue) {
     deviceSelect.appendChild(option);
 }
 
-// HTML Elementleri Alınıyor
+// !----------------------------------------------------------------HTML Elementleri Alınıyor----------------------------------------------------------------
 async function start() {
     try {
         if (pc) {
@@ -282,14 +279,13 @@ function stop() {
 
     remoteVideo.srcObject = null;
     log("Video stream stopped");
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
 toggleButton.addEventListener("click", toggleStream);
 
 log("Script loaded. Click the start button to begin.");
 
-// Log Fonksiyonu
+// !----------------------------------------------------------------Log Fonksiyonu--------------------------------------------------------------------------------------
 function log(message, level = 'info') {
     console.log(message);
 
@@ -312,7 +308,7 @@ function log(message, level = 'info') {
     logsContainer.scrollTop = logsContainer.scrollHeight;
 }
 
-
+// !----------------------------------------------------------------Kamera İzni Kontrolü--------------------------------------------------------------------------------------
 async function cameraPermission() {
     const result = await navigator.permissions.query({name: "camera"})
 
@@ -324,23 +320,22 @@ async function cameraPermission() {
     }
 }
 
+// !----------------------------------------------------------------Kamera İzni İçin Video Başlatma----------------------------------------------------------------
 async function StartVideoForPerm() {
-    try{
+    try {
         const stream = await navigator.mediaDevices.getUserMedia({'video': true})
         stream.getTracks().forEach(track => track.stop())
-    }catch{
+    } catch (error) {
         console.log("Error: " + error)
     }
 }
 
 connectSocket()
 
-
-
-// Tarayıcının kullanıcı aracısı bilgisini al
+// !----------------------------------------------------------------Tarayıcı Bilgilerini Alma----------------------------------------------------------------
 const userAgent = navigator.userAgent;
 
-// Tarayıcının adı ve versiyonunu bulmak için bir fonksiyon
+// !----------------------------------------------------------------Tarayıcı Adı ve Versiyonunu Bulma----------------------------------------------------------------
 function getBrowserInfo() {
     if (userAgent.indexOf("Firefox") > -1) {
         return "Mozilla Firefox";
@@ -361,15 +356,9 @@ function getBrowserInfo() {
     }
 }
 
-if(getBrowserInfo() == "Google Chrome"){
+if (getBrowserInfo() === "Google Chrome") {
     cameraPermission()
-}
-else if(getBrowserInfo() == "Mozilla Firefox"){
+} else if (getBrowserInfo() === "Mozilla Firefox") {
     StartVideoForPerm()
     getConnectedDevices()
 }
-
-
-
-
-
