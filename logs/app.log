@@ -1,0 +1,9 @@
+Aug 28, 2024 - 16:18:19 || ERROR || Server failed to start: __init__() got an unexpected keyword argument 'static_directory' || main.py ||47
+Aug 28, 2024 - 16:18:35 || INFO || FastAPI started || fastapiweb.py ||173
+Aug 28, 2024 - 16:18:50 || INFO || New Client Connected to This id : 2nuWwYowrZYyCU5yAAAB || fastapiweb.py ||71
+Aug 28, 2024 - 16:18:55 || INFO || Client disconnected:  2nuWwYowrZYyCU5yAAAB || fastapiweb.py ||79
+Aug 28, 2024 - 16:18:55 || INFO || New Client Connected to This id : D9u1-CaI5RK7LCfHAAAD || fastapiweb.py ||71
+Aug 28, 2024 - 16:18:57 || INFO || Received SDP offer || fastapiweb.py ||97
+Aug 28, 2024 - 16:18:57 || INFO || Track received video || fastapiweb.py ||102
+Aug 28, 2024 - 16:18:57 || INFO || Track added to PC || fastapiweb.py ||106
+Aug 28, 2024 - 16:19:17 || INFO || Client disconnected:  D9u1-CaI5RK7LCfHAAAD || fastapiweb.py ||79

@@ -44,8 +44,6 @@ class Detector:
 
                 detections.append(detection)
 
-                print(f"Class Name : {class_name}")
-
         processed_frame = results[0].plot()
 
         if processed_frame is None:

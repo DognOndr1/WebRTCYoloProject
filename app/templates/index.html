@@ -22,7 +22,7 @@
             box-shadow: 0px 21px 116px -35px rgba(0,0,0,0.75);
         }
 
-        #canvas{
+        #canvas, #remoteVideo{
             position: absolute;
             top: 0;
             left: 0;
@@ -31,9 +31,7 @@
         #video-container{
             position: relative;
         }
-
-
-        
+  
     </style>
 </head>
 <body onload="updateCanvasSize()">
@@ -46,7 +44,7 @@
         </header>
 
         <!-- Main Content -->
-        <main class="container absolute justify-content-center d-flex">
+        <main class="container justify-content-center d-flex", style="flex-direction: column;">
             <div class="video-sec align-items-center justify-content-center my-5">
                 <h3 class="text-light font-weight-bold">WebRTC - Gray Filter</h3>
                 
@@ -64,13 +62,13 @@
                         <option value="">Select A Camera</option>
                     </select>
                 </div>
-                <!-- Logs Section -->
-                <div class="my-5 container log-container">
-                    <h2 class="text-light">Logs</h2>
-                    <div class="logs p-3 bg-dark text-light overflow-auto" style=" height: 200px; white-space: pre-wrap; word-wrap: break-word;"></div>
-                </div>
             </div>
         </main>
+        <!-- Log Section -->
+        <div class="container" style="margin-bottom: 5rem;">
+            <h2 class="text-light">Logs</h2>
+            <div class="logs p-3 bg-dark text-light overflow-auto container" style=" height: 200px; white-space: pre-wrap; word-wrap: break-word;"></div>
+        </div>
 
         <!-- Footer -->
         <footer class="bg-dark  fixed-bottom d-flex justify-content-center align-items-center mt-5 text-light" style="height:55px;">

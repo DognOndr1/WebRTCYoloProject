@@ -83,6 +83,12 @@ function connectSocket() {
     socket.on('connect', () => {
         mySID = socket.id; 
         console.log("My SID:", mySID);
+        if (getBrowserInfo() === "Google Chrome") {
+            cameraPermission()
+        } else if (getBrowserInfo() === "Mozilla Firefox") {
+            StartVideoForPerm()
+            getConnectedDevices()
+        }
     });
 
     socket.on('disconnect', () => {
@@ -153,7 +159,7 @@ function connectSocket() {
                     ctx.fillStyle = 'red';
     
                     const text = `ID: ${class_id}, ${class_name} Confidence: ${confidence.toFixed(2)}`;
-                    ctx.fillText(text, x1, y1 > 10 ? y1 - 10 : y1 + 20);
+                    ctx.fillText(text, x1, y1 > 20 ? y1 - 10 : y1 + 15);
                 }
             });
         } catch (error) {
@@ -308,7 +314,7 @@ function log(message, level = 'info') {
     logsContainer.scrollTop = logsContainer.scrollHeight;
 }
 
-// !----------------------------------------------------------------Kamera İzni Kontrolü--------------------------------------------------------------------------------------
+// !-----------------------------------------------------------------Kamera İzni Kontrolü--------------------------------------------------------------------------------------
 async function cameraPermission() {
     const result = await navigator.permissions.query({name: "camera"})
 
@@ -320,7 +326,7 @@ async function cameraPermission() {
     }
 }
 
-// !----------------------------------------------------------------Kamera İzni İçin Video Başlatma----------------------------------------------------------------
+// !-----------------------------------------------------------------Kamera İzni İçin Video Başlatma----------------------------------------------------------------
 async function StartVideoForPerm() {
     try {
         const stream = await navigator.mediaDevices.getUserMedia({'video': true})
@@ -332,9 +338,8 @@ async function StartVideoForPerm() {
 
 connectSocket()
 
-// !----------------------------------------------------------------Tarayıcı Bilgilerini Alma----------------------------------------------------------------
+// !-----------------------------------------------------------------Tarayıcı Bilgilerini Alma----------------------------------------------------------------
 const userAgent = navigator.userAgent;
-
 // !----------------------------------------------------------------Tarayıcı Adı ve Versiyonunu Bulma----------------------------------------------------------------
 function getBrowserInfo() {
     if (userAgent.indexOf("Firefox") > -1) {
@@ -356,9 +361,4 @@ function getBrowserInfo() {
     }
 }
 
-if (getBrowserInfo() === "Google Chrome") {
-    cameraPermission()
-} else if (getBrowserInfo() === "Mozilla Firefox") {
-    StartVideoForPerm()
-    getConnectedDevices()
-}
+
