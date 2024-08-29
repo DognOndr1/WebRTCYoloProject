@@ -292,7 +292,7 @@ async function start() {
                 loader.classList.remove("loader");
                 delay = false; // Allow detection drawing
                 log("Detection started after 5 seconds");
-            }, 20000); // 5000 milliseconds = 5 seconds
+            }, 3000); // 5000 milliseconds = 5 seconds
             
         } else {
             log("No video device selected", 'warning');

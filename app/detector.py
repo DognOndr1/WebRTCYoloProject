@@ -7,6 +7,7 @@ class Detector:
 
     def __post_init__(self):
         self.model = YOLO("yolov10n.pt")
+        self.model.to('cuda')
         self.class_names = self.model.names
 
     def process_frame(self, frame):
