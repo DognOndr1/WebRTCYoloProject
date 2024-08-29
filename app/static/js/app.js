@@ -131,10 +131,7 @@ function connectSocket() {
             detectionsArray.forEach(detection => {
                 if (detection.sid === mySID) {
                     const { bounding_box, confidence, class_id, class_name } = detection;
-    
-                    if (confidence < 0.40) {
-                        return;
-                    }
+
     
                     let { x1, y1, x2, y2 } = bounding_box;
     
