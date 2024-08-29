@@ -54,6 +54,7 @@ async function toggleStream() {
 const canvas = document.getElementById('canvas');
 let ctx = canvas.getContext('2d');
 
+
 // !----------------------------------------------------------------Canvas Boyutunu Güncelleme----------------------------------------------------------------
 function updateCanvasSize() {
     const videoRect = remoteVideo.getBoundingClientRect();
@@ -131,8 +132,9 @@ function connectSocket() {
             detectionsArray.forEach(detection => {
                 if (detection.sid === mySID) {
                     const { bounding_box, confidence, class_id, class_name } = detection;
-
-    
+                    
+                    
+     
                     let { x1, y1, x2, y2 } = bounding_box;
     
                     x1 *= scaleX;
@@ -249,6 +251,7 @@ function addOptionToSelect(optionText, optionValue) {
 
 // !----------------------------------------------------------------HTML Elementleri Alınıyor----------------------------------------------------------------
 async function start() {
+    
     try {
         if (pc) {
             pc.close();
@@ -261,6 +264,7 @@ async function start() {
         } else {
             log("No video device selected", 'warning');
         }
+        canvas.style.opacity = "1"
     } catch (error) {
         log("Error starting the connection: " + error, 'error');
     }
@@ -282,6 +286,7 @@ function stop() {
 
     remoteVideo.srcObject = null;
     log("Video stream stopped");
+    canvas.style.opacity = "0"
 }
 
 toggleButton.addEventListener("click", toggleStream);
