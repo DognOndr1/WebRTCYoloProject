@@ -7,6 +7,8 @@ const config = {
     ]
 };
 
+
+
 // !----------------------------------------------------------------Kullanılacak Medya Akışları Belirleniyor----------------------------------------------------------------
 const constraints = {
     video: { deviceId: undefined }, 
@@ -18,6 +20,7 @@ let socket = null;
 let stream = null;
 let isStreaming = false;
 let deviceType = getDeviceType();
+const loader = document.querySelector(".loading");
 
 // !----------------------------------------------------------------Cihaz Türünü Belirleme----------------------------------------------------------------
 function getDeviceType() {
@@ -118,53 +121,59 @@ function connectSocket() {
     });
 
     socket.on('detections', (data) => {
+
+
         try {
             const parsedData = JSON.parse(data);
             const detectionsArray = parsedData.detections;
             const originalWidth = parsedData.original_width;
             const originalHeight = parsedData.original_height;
-    
+
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
+
             const scaleX = canvas.width / originalWidth;
             const scaleY = canvas.height / originalHeight;
-    
+
             detectionsArray.forEach(detection => {
                 if (detection.sid === mySID) {
+
+                    
                     const { bounding_box, confidence, class_id, class_name } = detection;
-                    
-                    
-     
+
                     let { x1, y1, x2, y2 } = bounding_box;
-    
+
                     x1 *= scaleX;
                     y1 *= scaleY;
                     x2 *= scaleX;
                     y2 *= scaleY;
-    
-                    ctx.strokeStyle = 'blue';
-                    ctx.lineWidth = 2;
-    
-                    ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
 
-                    if (deviceType === "mobile") {
-                        ctx.font = '12px Arial';
-                        ctx.lineWidth = 1;
-                    } else {
-                        ctx.font = '16px Arial';
+                    if(delay === false){
+                        ctx.strokeStyle = 'blue';
                         ctx.lineWidth = 2;
+
+                        ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
+                        
+
+                        if (deviceType === "mobile") {
+                            ctx.font = '12px Arial';
+                            ctx.lineWidth = 1;
+                        } else {
+                            ctx.font = '16px Arial';
+                            ctx.lineWidth = 2;
+                        }
+
+                        ctx.fillStyle = 'red';
+
+                        const text = `ID: ${class_id}, ${class_name} Confidence: ${confidence.toFixed(2)}`;
+                        ctx.fillText(text, x1, y1 > 20 ? y1 - 10 : y1 + 15);
                     }
-    
-                    ctx.fillStyle = 'red';
-    
-                    const text = `ID: ${class_id}, ${class_name} Confidence: ${confidence.toFixed(2)}`;
-                    ctx.fillText(text, x1, y1 > 20 ? y1 - 10 : y1 + 15);
                 }
             });
         } catch (error) {
             console.error('Error parsing detections:', error);
         }
     });
+
 }
 
 // !----------------------------------------------------------------Video Görünümünü Duyarlı Yapma----------------------------------------------------------------
@@ -260,10 +269,10 @@ function addOptionToSelect(optionText, optionValue) {
     option.value = optionValue;
     deviceSelect.appendChild(option);
 }
-
+let delay
+let timeoutId
 // !----------------------------------------------------------------HTML Elementleri Alınıyor----------------------------------------------------------------
 async function start() {
-    
     try {
         if (pc) {
             pc.close();
@@ -273,14 +282,27 @@ async function start() {
         if (selectedDeviceId) {
             await getMedia(selectedDeviceId);
             log("Video stream started");
+
+            // Show the loader
+
+            loader.classList.add("loader");
+
+            // Wait for 5 seconds before starting the detection
+            timeoutId = setTimeout(() => {
+                loader.classList.remove("loader");
+                delay = false; // Allow detection drawing
+                log("Detection started after 5 seconds");
+            }, 20000); // 5000 milliseconds = 5 seconds
+            
         } else {
             log("No video device selected", 'warning');
         }
-        canvas.style.opacity = "1"
+        canvas.style.opacity = "1";
     } catch (error) {
         log("Error starting the connection: " + error, 'error');
     }
 }
+
 
 function stop() {
     log("Stopping Video");
@@ -295,8 +317,10 @@ function stop() {
         pc.close();
         pc = null;
     }
-
+    loader.classList.remove("loader");
+    clearTimeout(timeoutId);
     remoteVideo.srcObject = null;
+    delay = true
     log("Video stream stopped");
     canvas.style.opacity = "0"
 }

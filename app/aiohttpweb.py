@@ -100,7 +100,7 @@ class AIOHTTPWeb(WebServer):
             def on_track(track):
                 print(f"Track received: {track.kind}")
                 if track.kind == "video":
-                    gray_track = GrayVideoStreamTrack(self.relay.subscribe(track), self.sio, sid=sid)
+                    gray_track = ObjectDetection(self.relay.subscribe(track), self.sio, sid=sid)
                     print("Track added to pc")
                     pc.addTrack(gray_track)
 
@@ -179,7 +179,7 @@ class AIOHTTPWeb(WebServer):
     def run(self):
         self.server()
 
-class GrayVideoStreamTrack(VideoStreamTrack):
+class ObjectDetection(VideoStreamTrack):
     def __init__(self, track, sio, sid):
         super().__init__()
         self.track = track
@@ -197,10 +197,9 @@ class GrayVideoStreamTrack(VideoStreamTrack):
         img = np.array(frame.to_ndarray(format="bgr24"))
 
         if self.original_width is None or self.original_height is None:
-            self.original_width = img.shape[1]
-            self.original_height = img.shape[0]
+            self.original_height, self.original_width = img.shape[:2]
 
-        processed_frame, detections = self.detector.process_frame(img)
+        detections = self.detector.process_frame(img)
 
         if detections:
             for detection in detections:
@@ -211,19 +210,12 @@ class GrayVideoStreamTrack(VideoStreamTrack):
                 'original_width': self.original_width,
                 'original_height': self.original_height
             }
-            
+
             await self.sio.emit('detections', json.dumps(data_to_send))
         else:
             print("No detections found")
-        
-        if processed_frame is None or not isinstance(processed_frame, np.ndarray):
-            raise ValueError("Processed frame is None or not a numpy array")
 
-        new_frame = VideoFrame.from_ndarray(processed_frame, format="bgr24")
-        new_frame.time_base = frame.time_base
-        new_frame.pts = frame.pts
-        new_frame.dts = frame.dts
-        return new_frame
+        return frame  
 
 def parse_candidate(candidate_str):
     parts = candidate_str.split()

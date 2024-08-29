@@ -41,5 +41,4 @@ class Detector:
 
                 detections.append(detection)
 
-
-        return frame, detections  
+        return detections 
