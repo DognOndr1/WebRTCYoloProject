@@ -1,13 +1,15 @@
 from ultralytics import YOLO
 from dataclasses import dataclass
+import torch  
 
 @dataclass
 class Detector:
     model: str = None
 
     def __post_init__(self):
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self.model = YOLO("yolov10n.pt")
-        self.model.to('cuda')
+        self.model.to(self.device)
         self.class_names = self.model.names
 
     def process_frame(self, frame):
@@ -42,4 +44,4 @@ class Detector:
 
                 detections.append(detection)
 
-        return detections 
+        return detections
