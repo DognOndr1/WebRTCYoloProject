@@ -1,13 +1,12 @@
 from ultralytics import YOLO
 from dataclasses import dataclass
-import numpy as np
 
 @dataclass
 class Detector:
     model: str = None
 
     def __post_init__(self):
-        self.model = YOLO("yolov8n.pt")
+        self.model = YOLO("yolov10n.pt")
         self.class_names = self.model.names
 
     def process_frame(self, frame):
@@ -41,5 +40,6 @@ class Detector:
                 }
 
                 detections.append(detection)
+
 
         return frame, detections  

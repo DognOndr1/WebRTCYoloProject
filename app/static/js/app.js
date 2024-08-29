@@ -186,13 +186,13 @@ async function getMedia(deviceId) {
         if (stream) {
             stream.getTracks().forEach(track => track.stop());
         }
-        
+
         if (pc) {
             pc.close();
         }
 
         constraints.video.deviceId = { exact: deviceId };
-        
+
         stream = await navigator.mediaDevices.getUserMedia(constraints);
         pc = new RTCPeerConnection(config);
 
@@ -204,6 +204,18 @@ async function getMedia(deviceId) {
         pc.oniceconnectionstatechange = () => {
             log("ICE connection state: " + pc.iceConnectionState);
         };
+
+        pc.onicecandidate = (event) => {
+            if (event.candidate) {
+                // ICE adayının tüm özelliklerini JSON formatında konsola yazdırma
+                console.log("New ICE candidate:", JSON.stringify(event.candidate, null, 2));
+                log("New ICE candidate: " + JSON.stringify(event.candidate, null, 2));
+                
+                // ICE adayını sunucuya gönderme
+                socket.emit('ice_candidate', event.candidate);
+            }
+        };
+        
 
         pc.ontrack = (event) => {
             const incomingStream = event.streams[0];
@@ -220,7 +232,7 @@ async function getMedia(deviceId) {
 
         const offer = await pc.createOffer();
         await pc.setLocalDescription(offer);
-        
+
         log("Created and set local offer: " + JSON.stringify(offer));
         socket.emit('sdp', { type: offer.type, sdp: offer.sdp });
 
