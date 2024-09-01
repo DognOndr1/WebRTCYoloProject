@@ -3,14 +3,15 @@ from app.flaskweb import FlaskWebServer
 from app.config import ConfigLoader
 from app.logs import Logger
 from app.aiohttpweb import AIOHTTPWeb
-import argparse
+import argparse,os
 
 
 def main(config):
     logger = Logger(**config["Logging"])
 
-    cert_directory = config.get("Certificates", {}).get("cert_directory")
-    key_directory = config.get("Certificates", {}).get("key_directory")
+    module_directory = os.path.dirname(os.path.abspath(__file__))
+    cert_directory = os.path.join(module_directory,"cert.pem")
+    key_directory = os.path.join(module_directory,"key.pem")
 
     try:
         api_choice = config["API"]["chosen_api"]

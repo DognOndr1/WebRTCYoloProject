@@ -5,7 +5,7 @@ debug = true
 is_active = true
 
 [API]
-chosen_api = "Fast"
+chosen_api = "aiohttp"
 
 [Static]
 static_directory = "app/static"

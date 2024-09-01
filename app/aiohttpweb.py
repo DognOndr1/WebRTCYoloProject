@@ -12,7 +12,7 @@ from aiortc import (
 )
 from av import VideoFrame
 from aiortc.contrib.media import MediaRelay
-import cv2
+import cv2,os
 import numpy as np
 
 if __name__ == "__main__":
@@ -168,6 +168,10 @@ class AIOHTTPWeb(WebServer):
         self.app.router.add_get("/framework", get_framework)
         self.register_socket_events()
 
+        module_directory = os.path.dirname(os.path.abspath(__file__))
+        self.ssl_cert = os.path.join(module_directory, "..", "cert.pem")
+        self.ssl_key = os.path.join(module_directory, "..", "key.pem")
+
         ssl_context = None
         if self.ssl_cert and self.ssl_key:
             ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
@@ -221,7 +225,14 @@ def parse_candidate(candidate_str):
     }
 
 
+
 if __name__ == "__main__":
+
+
+    module_directory = os.path.dirname(os.path.abspath(__file__))
+    ssl_cert = os.path.join(module_directory, "..", "cert.pem")
+    ssl_key = os.path.join(module_directory, "..", "key.pem")
+
     web_server = AIOHTTPWeb(
         host="0.0.0.0",
         port=8000,
@@ -231,8 +242,8 @@ if __name__ == "__main__":
         temp_directory="templates",
         logger=None,
         pcs={},
-        ssl_cert="/home/dogan/cert.pem",  # Add path to your SSL certificate
-        ssl_key="/home/dogan/key.pem",  # Add path to your SSL private key
+        ssl_cert=ssl_cert,  
+        ssl_key=ssl_key,
     )
 
     web_server.run()

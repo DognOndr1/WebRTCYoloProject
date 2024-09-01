@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from typing import Any
 import uvicorn, cv2
 from fastapi.responses import JSONResponse
-import cv2
+import cv2,os
 import numpy as np
 
 from aiortc import (
@@ -156,6 +156,10 @@ class FastAPIWebServer(WebServer):
             else:
                 print(f"No RTCPeerConnection found for sid: {sid}")
 
+        module_directory = os.path.dirname(os.path.abspath(__file__))
+        self.ssl_cert = os.path.join(module_directory, "..", "cert.pem")
+        self.ssl_key = os.path.join(module_directory, "..", "key.pem")
+
         ssl_context = None
         if self.ssl_cert and self.ssl_key:
             ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
@@ -230,6 +234,10 @@ if __name__ == "__main__":
         "rotation": "10MB",
     }
 
+    module_directory = os.path.dirname(os.path.abspath(__file__))
+    ssl_cert = os.path.join(module_directory, "..", "cert.pem")
+    ssl_key = os.path.join(module_directory, "..", "key.pem")
+
     fastapiweb = FastAPIWebServer(
         "0.0.0.0",
         8000,
@@ -238,8 +246,8 @@ if __name__ == "__main__":
         static_directory="static",
         temp_directory="templates",
         logger=Logger(**logger_configs),
-        ssl_cert="/home/dogan/cert.pem",
-        ssl_key="/home/dogan/key.pem",
+        ssl_cert=ssl_cert,
+        ssl_key=ssl_key,
     )
 
     fastapiweb.run()
