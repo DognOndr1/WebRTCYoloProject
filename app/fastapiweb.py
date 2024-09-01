@@ -34,6 +34,7 @@ class FastAPIWebServer(WebServer):
     port: int
     is_active: bool
     debug: bool
+    object_detection: bool 
     static_directory: str = None
     temp_directory: str = None
     pcs: dict = None
@@ -41,6 +42,7 @@ class FastAPIWebServer(WebServer):
     socket_app: Any = None
     ssl_cert: str = None
     ssl_key: str = None
+    
 
     def __post_init__(self):
         self.env: str = "local.toml"
@@ -60,11 +62,10 @@ class FastAPIWebServer(WebServer):
         async def home(request: Request):
             return self.templates.TemplateResponse("index.html", {"request": request})
 
-        @self.app.get("/framework")
+        @self.app.get("/object_detect")
         async def get_framework():
-            return JSONResponse({"framework": "fastapi"})
+            return JSONResponse({"object_detection": self.object_detection})
 
-        # Socket.IO dinleyicileri
         @self.sio.on("connect")
         async def connect(sid, env):
             self.logger.info("New Client Connected to This id :" + " " + str(sid))

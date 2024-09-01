@@ -29,6 +29,7 @@ class AIOHTTPWeb(WebServer):
     host: str
     port: int
     is_active: bool
+    object_detection: bool 
     debug: bool
     static_directory: str = None
     temp_directory: str = None
@@ -53,6 +54,8 @@ class AIOHTTPWeb(WebServer):
             self.pcs = {}
 
     def register_socket_events(self):
+
+        
         @self.sio.event
         async def connect(sid, environ):
             print(f"Client Connected {sid}")
@@ -100,9 +103,9 @@ class AIOHTTPWeb(WebServer):
             def on_track(track):
                 print(f"Track received: {track.kind}")
                 if track.kind == "video":
-                    gray_track = ObjectDetection(self.relay.subscribe(track), self.sio, sid=sid)
+                    obj_detect = ObjectDetection(self.relay.subscribe(track), self.sio, sid=sid)
                     print("Track added to pc")
-                    pc.addTrack(gray_track)
+                    pc.addTrack(obj_detect)
 
             await pc.setRemoteDescription(offer)
             answer = await pc.createAnswer()
@@ -153,27 +156,29 @@ class AIOHTTPWeb(WebServer):
                     print(f"Problematic data: {data}")
             else:
                 print(f"No RTCPeerConnection found for sid: {sid}")
-
+    
+    
+    async def get_object(self, request):
+        return web.json_response({"object_detection": self.object_detection})
+    
     def server(self):
         async def home(request):
             return aiohttp_jinja2.render_template("index.html", request, {})
 
-        async def get_framework(request):
-            return web.json_response({"framework": "aiohttp"})
-
         self.app.router.add_get("/", home)
-        self.app.router.add_get("/framework", get_framework)
+        self.app.router.add_get("/object_detect", self.get_object)
         self.register_socket_events()
-        
+
         module_directory = os.path.dirname(os.path.abspath(__file__))
-        self.ssl_cert = os.path.join(module_directory, "..","cert.pem")
-        self.ssl_key = os.path.join(module_directory, "..","key.pem")
+        self.ssl_cert = os.path.join(module_directory, "..", "cert.pem")
+        self.ssl_key = os.path.join(module_directory, "..", "key.pem")
         ssl_context = None
         if self.ssl_cert and self.ssl_key:
             ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
             ssl_context.load_cert_chain(certfile=self.ssl_cert, keyfile=self.ssl_key)
 
         web.run_app(self.app, host=self.host, port=self.port, ssl_context=ssl_context)
+
 
     @check_active_decorator
     def run(self):

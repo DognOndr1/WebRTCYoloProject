@@ -3,9 +3,10 @@ host = "0.0.0.0"
 port = 8000
 debug = false
 is_active = true
+object_detection = true
 
 [API]
-chosen_api = "Fast"
+chosen_api = "aiohttp"
 
 [Static]
 static_directory = "app/static"
@@ -19,5 +20,5 @@ log_file = "logs/app.log"
 log_format = "<green>{time:MMM D, YYYY - HH:mm:ss}</green> || <level>{level}</level> || <cyan>{message}</cyan> || <red>{file.name}</red> ||"
 rotation = "10 MB"
 
-[settings]
-use_cuda = true
+
+

@@ -7,8 +7,6 @@ const config = {
     ]
 };
 
-
-
 // !----------------------------------------------------------------Kullanılacak Medya Akışları Belirleniyor----------------------------------------------------------------
 const constraints = {
     video: { deviceId: undefined }, 
@@ -20,6 +18,7 @@ let socket = null;
 let stream = null;
 let isStreaming = false;
 let deviceType = getDeviceType();
+let object_detection = false
 const loader = document.querySelector(".loading");
 
 // !----------------------------------------------------------------Cihaz Türünü Belirleme----------------------------------------------------------------
@@ -57,7 +56,6 @@ async function toggleStream() {
 const canvas = document.getElementById('canvas');
 let ctx = canvas.getContext('2d');
 
-
 // !----------------------------------------------------------------Canvas Boyutunu Güncelleme----------------------------------------------------------------
 function updateCanvasSize() {
     const videoRect = remoteVideo.getBoundingClientRect();
@@ -78,6 +76,16 @@ remoteVideo.onloadedmetadata = () => {
     updateCanvasSize();
 };
 
+fetch('/object_detect')   
+    .then(response => response.json())  
+    .then(data => { 
+        console.log(data)
+            object_detection = data.object_detection
+        })  
+    .catch(error => { 
+            console.error("Error fetching object detection status:", error); 
+    });
+
 let mySID = null;
 
 // !----------------------------------------------------------------Socket Bağlantısını Yapma----------------------------------------------------------------
@@ -87,12 +95,7 @@ function connectSocket() {
     socket.on('connect', () => {
         mySID = socket.id; 
         console.log("My SID:", mySID);
-        if (getBrowserInfo() === "Google Chrome") {
-            cameraPermission()
-        } else if (getBrowserInfo() === "Mozilla Firefox") {
-            StartVideoForPerm()
-            getConnectedDevices()
-        }
+        cameraPermission();
     });
 
     socket.on('disconnect', () => {
@@ -121,8 +124,6 @@ function connectSocket() {
     });
 
     socket.on('detections', (data) => {
-
-
         try {
             const parsedData = JSON.parse(data);
             const detectionsArray = parsedData.detections;
@@ -136,8 +137,6 @@ function connectSocket() {
 
             detectionsArray.forEach(detection => {
                 if (detection.sid === mySID) {
-
-                    
                     const { bounding_box, confidence, class_id, class_name } = detection;
 
                     let { x1, y1, x2, y2 } = bounding_box;
@@ -152,7 +151,6 @@ function connectSocket() {
                         ctx.lineWidth = 2;
 
                         ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
-                        
 
                         if (deviceType === "mobile") {
                             ctx.font = '12px Arial';
@@ -173,7 +171,6 @@ function connectSocket() {
             console.error('Error parsing detections:', error);
         }
     });
-
 }
 
 // !----------------------------------------------------------------Video Görünümünü Duyarlı Yapma----------------------------------------------------------------
@@ -198,68 +195,86 @@ async function getMedia(deviceId) {
 
         if (pc) {
             pc.close();
+            pc = null;
         }
 
         constraints.video.deviceId = { exact: deviceId };
 
         stream = await navigator.mediaDevices.getUserMedia(constraints);
-        pc = new RTCPeerConnection(config);
-
         remoteVideo.srcObject = stream;
         remoteVideo.onloadedmetadata = () => {
             updateCanvasSize();
         };
 
-        pc.oniceconnectionstatechange = () => {
-            log("ICE connection state: " + pc.iceConnectionState);
-        };
-
-        pc.onicecandidate = (event) => {
-            if (event.candidate) {
-                // ICE adayının tüm özelliklerini JSON formatında konsola yazdırma
-                console.log("New ICE candidate:", JSON.stringify(event.candidate, null, 2));
-                log("New ICE candidate: " + JSON.stringify(event.candidate, null, 2));
-                
-                // ICE adayını sunucuya gönderme
-                socket.emit('ice_candidate', event.candidate);
-            }
-        };
-        
-
-        pc.ontrack = (event) => {
-            const incomingStream = event.streams[0];
-            if (incomingStream) {
-                if (remoteVideo.srcObject !== incomingStream) {
-                    log("Remote video stream set");
-                }
-            } else {
-                log("No streams available in the remote track event");
-            }
-        };
-
-        stream.getTracks().forEach(track => pc.addTrack(track, stream));
-
-        const offer = await pc.createOffer();
-        await pc.setLocalDescription(offer);
-
-        log("Created and set local offer: " + JSON.stringify(offer));
-        socket.emit('sdp', { type: offer.type, sdp: offer.sdp });
+        if (object_detection === true) {
+            startWebRTC();
+        } else {
+            log("Object detection is disabled. Video is only displayed locally.");
+        }
 
     } catch (error) {
         log("Error in getMedia: " + error, 'error');
     }
 }
 
+function startWebRTC() {
+    pc = new RTCPeerConnection(config);
+
+    pc.oniceconnectionstatechange = () => {
+        log("ICE connection state: " + pc.iceConnectionState);
+    };
+
+    pc.onicecandidate = (event) => {
+        if (event.candidate) {
+            console.log("New ICE candidate:", JSON.stringify(event.candidate, null, 2));
+            log("New ICE candidate: " + JSON.stringify(event.candidate, null, 2));
+            socket.emit('ice_candidate', event.candidate);
+        }
+    };
+
+    pc.ontrack = (event) => {
+        const incomingStream = event.streams[0];
+        if (incomingStream) {
+            if (remoteVideo.srcObject !== incomingStream) {
+                log("Remote video stream set");
+            }
+        } else {
+            log("No streams available in the remote track event");
+        }
+    };
+
+    stream.getTracks().forEach(track => pc.addTrack(track, stream));
+
+    pc.createOffer().then(offer => {
+        return pc.setLocalDescription(offer);
+    }).then(() => {
+        log("Created and set local offer: " + JSON.stringify(pc.localDescription));
+        socket.emit('sdp', { type: pc.localDescription.type, sdp: pc.localDescription.sdp });
+    }).catch(error => {
+        log("Error creating or setting local description: " + error, 'error');
+    });
+}
+
 // !----------------------------------------------------------------Bağlı Cihazları Alma--------------------------------------------------------------------------------------
-function getConnectedDevices() {
-    navigator.mediaDevices.enumerateDevices()
-    .then(devices => {
+async function getConnectedDevices() {
+    try {
+        const devices = await navigator.mediaDevices.enumerateDevices();
         const filtered = devices.filter(device => device.kind === 'videoinput');
         deviceSelect.innerHTML = ''; 
         filtered.forEach(device => {
             addOptionToSelect(device.label || `Camera ${filtered.indexOf(device) + 1}`, device.deviceId);
         });
-    });
+        
+        // Eğer hiç kamera bulunamazsa, kullanıcıya bilgi ver
+        if (filtered.length === 0) {
+            log("No cameras found. Please check your camera permissions and connections.", 'warning');
+        } else {
+            log("Cameras listed successfully.");
+        }
+    } catch (error) {
+        console.log("Error enumerating devices: " + error);
+        log("Error listing cameras. Please refresh the page and try again.", 'error');
+    }
 }
 
 // !---------------------------------------------------------------Select Öğesine Seçenek Ekleme----------------------------------------------------------------
@@ -269,8 +284,10 @@ function addOptionToSelect(optionText, optionValue) {
     option.value = optionValue;
     deviceSelect.appendChild(option);
 }
-let delay
-let timeoutId
+
+let delay;
+let timeoutId;
+
 // !----------------------------------------------------------------HTML Elementleri Alınıyor----------------------------------------------------------------
 async function start() {
     try {
@@ -284,7 +301,6 @@ async function start() {
             log("Video stream started");
 
             // Show the loader
-
             loader.classList.add("loader");
 
             // Wait for 5 seconds before starting the detection
@@ -292,7 +308,7 @@ async function start() {
                 loader.classList.remove("loader");
                 delay = false; // Allow detection drawing
                 log("Detection started after 5 seconds");
-            }, 3000); // 5000 milliseconds = 5 seconds
+            }, 10000); // 10000 milliseconds = 10 seconds
             
         } else {
             log("No video device selected", 'warning');
@@ -302,7 +318,6 @@ async function start() {
         log("Error starting the connection: " + error, 'error');
     }
 }
-
 
 function stop() {
     log("Stopping Video");
@@ -320,9 +335,9 @@ function stop() {
     loader.classList.remove("loader");
     clearTimeout(timeoutId);
     remoteVideo.srcObject = null;
-    delay = true
+    delay = true;
     log("Video stream stopped");
-    canvas.style.opacity = "0"
+    canvas.style.opacity = "0";
 }
 
 toggleButton.addEventListener("click", toggleStream);
@@ -354,13 +369,16 @@ function log(message, level = 'info') {
 
 // !-----------------------------------------------------------------Kamera İzni Kontrolü--------------------------------------------------------------------------------------
 async function cameraPermission() {
-    const result = await navigator.permissions.query({name: "camera"})
-
-    if(result.state === "granted"){
-        getConnectedDevices()
-    }else{
-        StartVideoForPerm()
-        getConnectedDevices()
+    try {
+        const result = await navigator.permissions.query({name: "camera"})
+        if(result.state === "granted"){
+            await getConnectedDevices()
+        } else {
+            await StartVideoForPerm()
+        }
+    } catch (error) {
+        console.log("Error checking camera permission: " + error)
+        await StartVideoForPerm()
     }
 }
 
@@ -369,34 +387,11 @@ async function StartVideoForPerm() {
     try {
         const stream = await navigator.mediaDevices.getUserMedia({'video': true})
         stream.getTracks().forEach(track => track.stop())
+        // İzin alındıktan sonra cihazları yeniden listele
+        await getConnectedDevices()
     } catch (error) {
-        console.log("Error: " + error)
+        console.log("Error getting camera permission: " + error)
     }
 }
 
 connectSocket()
-
-// !-----------------------------------------------------------------Tarayıcı Bilgilerini Alma----------------------------------------------------------------
-const userAgent = navigator.userAgent;
-// !----------------------------------------------------------------Tarayıcı Adı ve Versiyonunu Bulma----------------------------------------------------------------
-function getBrowserInfo() {
-    if (userAgent.indexOf("Firefox") > -1) {
-        return "Mozilla Firefox";
-    } else if (userAgent.indexOf("SamsungBrowser") > -1) {
-        return "Samsung Internet";
-    } else if (userAgent.indexOf("Opera") > -1 || userAgent.indexOf("OPR") > -1) {
-        return "Opera";
-    } else if (userAgent.indexOf("Trident") > -1) {
-        return "Internet Explorer";
-    } else if (userAgent.indexOf("Edge") > -1) {
-        return "Microsoft Edge";
-    } else if (userAgent.indexOf("Chrome") > -1) {
-        return "Google Chrome";
-    } else if (userAgent.indexOf("Safari") > -1) {
-        return "Safari";
-    } else {
-        return "Bilinmeyen Tarayıcı";
-    }
-}
-
-
