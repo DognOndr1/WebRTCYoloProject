@@ -33,86 +33,17 @@ const remoteVideo = document.querySelector("video#remoteVideo");
 const logsContainer = document.querySelector(".logs");
 const toggleButton = document.querySelector("#toggleButton");
 const deviceSelect = document.getElementById("devices");
-const detectorBtn = document.querySelector(".detector-btn");
-const video_feed = document.querySelector("#video_feed")
 const detectorSection = document.querySelector(".detector-section")
 const videoSection = document.querySelector(".video-sec");
-const videoFeed = document.querySelector("#video_feed");
-
-
-/*
-    * -----------------------------------------------------------------------Obje Tespiti Buton Ayarları --------------------------------------------------------------------
-*/
-document.querySelector(".detector-btn").addEventListener("click", function(){
-/*
-    * -------------------------------------------------------------Buton İçindeki Yazıya Göre Buton İşlevi Belirleniyor --------------------------------------------------------------------
-*/
-    if (detectorBtn.innerHTML === "Start") {
-        // Start işlemi
-        fetch('/start', {
-            method: 'GET'
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            videoFeed.src = "/video_feed";
-        })
-        .then(() => startB())
-        .catch(error => console.log('Error: ' + error));
-    } else {
-        // Stop işlemi
-        fetch('/stop', {
-            method: 'GET'
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            videoFeed.src = ""; // Video akışını durdurmak için src'yi boş yapıyoruz
-        })
-        .then(() => stopB())
-        .catch(error => console.log('Error: ' + error));
-    }
-});
-
-function startB(){
-    detectorBtn.innerHTML = "Stop";
-    detectorBtn.classList.add("bg-danger");
-    detectorBtn.classList.remove("bg-dark");
-}
-
-function stopB(){
-    detectorBtn.innerHTML = "Start";
-    detectorBtn.classList.remove("bg-danger");
-    detectorBtn.classList.add("bg-dark");
-}
 
 
 /*
     * ----------------------------------------------------------Kullanılarn Frameworke Göre Arayüz Ayarlanıyor --------------------------------------------------------------------
 */
 
-fetch('/framework')
-    .then(response => response.json())
-    .then(data => {
-        setUIForFramework(data.framework);
-    })
-    .catch(error => log('Error: ' + error, 'error'));
 
-function setUIForFramework(framework) {
-    if (framework === 'aiohttp' || framework === 'fastapi') {
-        videoSection.style.display = 'flex'; 
-        videoSection.style.flexDirection = 'column'; 
-        detectorSection.style.display = "none"; 
-        connectSocket();
-        getConnectedDevices();
-    } else {
-        log("Fast or Flask selected");
-        videoSection.style.display = 'none';
-        detectorSection.style.justifyContent = "center"
-    }
-}
+connectSocket();
+getConnectedDevices();
 
 
 /*
