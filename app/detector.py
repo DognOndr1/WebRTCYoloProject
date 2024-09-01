@@ -1,7 +1,5 @@
 from ultralytics import YOLO
 from dataclasses import dataclass
-import cv2, json
-import numpy as np
 
 @dataclass
 class Detector:
