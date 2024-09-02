@@ -34,6 +34,8 @@ class FastAPIWebServer(WebServer):
     port: int
     is_active: bool
     debug: bool
+    object_detection: bool
+    use_cuda: bool
     static_directory: str = None
     temp_directory: str = None
     pcs: dict = None
@@ -63,8 +65,11 @@ class FastAPIWebServer(WebServer):
         @self.app.get("/framework")
         async def get_framework():
             return JSONResponse({"framework": "fastapi"})
+        
+        @self.app.get("/object_detect")
+        async def get_framework():
+            return JSONResponse({"object_detection": self.object_detection})
 
-        # Socket.IO dinleyicileri
         @self.sio.on("connect")
         async def connect(sid, env):
             
@@ -102,7 +107,7 @@ class FastAPIWebServer(WebServer):
                 self.logger.info(f"Track received {track.kind}")
                 if track.kind == "video":
                     print("Gray Track Mesajı")
-                    gray_track = GrayVideoStreamTrack(self.relay.subscribe(track))
+                    gray_track = GrayVideoStreamTrack(self.relay.subscribe(track), use_cuda=self.use_cuda)
                     self.logger.info("Track added to PC")
                     pc.addTrack(gray_track)
 
@@ -122,6 +127,7 @@ class FastAPIWebServer(WebServer):
                 {"sdp": pc.localDescription.sdp, "type": pc.localDescription.type},
                 to=sid,
             )
+
 
         @self.sio.on("ice_candidate")
         async def handle_ice_candidate(sid, data):
@@ -180,13 +186,13 @@ class FastAPIWebServer(WebServer):
 
 
 class GrayVideoStreamTrack(VideoStreamTrack):
-    def __init__(self, track):
+    def __init__(self, track,use_cuda):
         super().__init__()
         self.track = track
-        self.detector = Detector()
+        self.detector = Detector(use_cuda=use_cuda)
 
     async def recv(self):
-        frame = await self.track.recv()  # Alınan çerçeve
+        frame = await self.track.recv() 
         if not isinstance(frame, VideoFrame):
             raise ValueError("Frame is not a VideoFrame")
 

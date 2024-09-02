@@ -4,9 +4,10 @@ port = 8000
 debug = true
 is_active = true
 object_detection = true
+use_cuda = true
 
 [API]
-chosen_api = "aiohttp"
+chosen_api = "Fast"
 
 [Static]
 static_directory = "app/static"

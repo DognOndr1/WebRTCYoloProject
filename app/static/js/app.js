@@ -133,6 +133,7 @@ async function getMedia(deviceId) {
         if (object_detection === true) {
             startWebRTC();
         } else {
+            remoteVideo.srcObject = stream
             log("Object detection is disabled. Video is only displayed locally.");
         }
 

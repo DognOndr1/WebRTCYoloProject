@@ -4962,3 +4962,82 @@ Sep 1, 2024 - 15:53:03 || INFO || Client disconnected:  NIHDeXF-tEHNERy8AAAB || 
 Sep 1, 2024 - 15:53:04 || INFO || New Client Connected to This id : kWQIn7c6phY6HZoSAAAF || fastapiweb.py ||71
 Sep 1, 2024 - 15:54:25 || INFO || Client disconnected:  f5zQRhGfVGUOznnKAAAD || fastapiweb.py ||79
 Sep 1, 2024 - 15:54:25 || INFO || Client disconnected:  kWQIn7c6phY6HZoSAAAF || fastapiweb.py ||79
+Sep 2, 2024 - 12:37:20 || ERROR || Server failed to start: __init__() got an unexpected keyword argument 'object_detection' || main.py ||47
+Sep 2, 2024 - 12:38:18 || INFO || FastAPI started || fastapiweb.py ||173
+Sep 2, 2024 - 12:38:19 || INFO || New Client Connected to This id : SyLYcJmR5ABh2HurAAAB || fastapiweb.py ||76
+Sep 2, 2024 - 12:38:22 || INFO || New Client Connected to This id : n6AWVRfSL8fnA_iqAAAD || fastapiweb.py ||76
+Sep 2, 2024 - 12:38:23 || INFO || Client disconnected:  n6AWVRfSL8fnA_iqAAAD || fastapiweb.py ||84
+Sep 2, 2024 - 12:38:27 || INFO || Client disconnected:  SyLYcJmR5ABh2HurAAAB || fastapiweb.py ||84
+Sep 2, 2024 - 12:38:31 || INFO || New Client Connected to This id : uMZY-KPiDl20g9OJAAAF || fastapiweb.py ||76
+Sep 2, 2024 - 12:38:37 || INFO || Received SDP offer || fastapiweb.py ||102
+Sep 2, 2024 - 12:38:37 || INFO || Track received video || fastapiweb.py ||107
+Sep 2, 2024 - 12:38:37 || INFO || Track added to PC || fastapiweb.py ||111
+Sep 2, 2024 - 12:38:37 || INFO || Received ICE Candidate || fastapiweb.py ||133
+Sep 2, 2024 - 12:38:37 || INFO || Received ICE Candidate || fastapiweb.py ||133
+Sep 2, 2024 - 12:38:37 || INFO || Received ICE Candidate || fastapiweb.py ||133
+Sep 2, 2024 - 12:38:43 || INFO || Client disconnected:  uMZY-KPiDl20g9OJAAAF || fastapiweb.py ||84
+Sep 2, 2024 - 12:39:02 || INFO || FastAPI started || fastapiweb.py ||173
+Sep 2, 2024 - 12:39:03 || INFO || New Client Connected to This id : fgy6X8MBMy-ybrMyAAAB || fastapiweb.py ||76
+Sep 2, 2024 - 12:39:03 || INFO || Client disconnected:  fgy6X8MBMy-ybrMyAAAB || fastapiweb.py ||84
+Sep 2, 2024 - 12:39:03 || INFO || New Client Connected to This id : qrFb7vHhTW63rcumAAAD || fastapiweb.py ||76
+Sep 2, 2024 - 12:39:43 || INFO || Client disconnected:  qrFb7vHhTW63rcumAAAD || fastapiweb.py ||84
+Sep 2, 2024 - 12:39:43 || INFO || New Client Connected to This id : nGOA9HVsRlflBd9kAAAF || fastapiweb.py ||76
+Sep 2, 2024 - 12:39:49 || INFO || Client disconnected:  nGOA9HVsRlflBd9kAAAF || fastapiweb.py ||84
+Sep 2, 2024 - 12:40:01 || INFO || FastAPI started || fastapiweb.py ||173
+Sep 2, 2024 - 12:40:03 || INFO || New Client Connected to This id : ZMbzmxyS73Qt7991AAAC || fastapiweb.py ||76
+Sep 2, 2024 - 12:40:04 || INFO || Received SDP offer || fastapiweb.py ||102
+Sep 2, 2024 - 12:40:04 || INFO || Track received video || fastapiweb.py ||107
+Sep 2, 2024 - 12:40:04 || INFO || Track added to PC || fastapiweb.py ||111
+Sep 2, 2024 - 12:40:04 || INFO || Received ICE Candidate || fastapiweb.py ||133
+Sep 2, 2024 - 12:40:04 || INFO || Received ICE Candidate || fastapiweb.py ||133
+Sep 2, 2024 - 12:40:04 || INFO || Received ICE Candidate || fastapiweb.py ||133
+Sep 2, 2024 - 12:51:42 || INFO || Client disconnected:  ZMbzmxyS73Qt7991AAAC || fastapiweb.py ||84
+Sep 2, 2024 - 12:51:48 || INFO || FastAPI started || fastapiweb.py ||173
+Sep 2, 2024 - 12:51:49 || INFO || New Client Connected to This id : PA46BfZdgx7ajPFgAAAB || fastapiweb.py ||76
+Sep 2, 2024 - 12:51:54 || INFO || Client disconnected:  PA46BfZdgx7ajPFgAAAB || fastapiweb.py ||84
+Sep 2, 2024 - 12:51:54 || INFO || New Client Connected to This id : dAeIXe3Q6jm1jMX-AAAD || fastapiweb.py ||76
+Sep 2, 2024 - 12:51:57 || INFO || Received SDP offer || fastapiweb.py ||102
+Sep 2, 2024 - 12:51:57 || INFO || Track received video || fastapiweb.py ||107
+Sep 2, 2024 - 12:51:57 || INFO || Received ICE Candidate || fastapiweb.py ||133
+Sep 2, 2024 - 12:51:57 || INFO || Received ICE Candidate || fastapiweb.py ||133
+Sep 2, 2024 - 12:51:57 || INFO || Received ICE Candidate || fastapiweb.py ||133
+Sep 2, 2024 - 12:52:18 || INFO || Client disconnected:  dAeIXe3Q6jm1jMX-AAAD || fastapiweb.py ||84
+Sep 2, 2024 - 12:53:01 || INFO || FastAPI started || fastapiweb.py ||173
+Sep 2, 2024 - 12:53:02 || INFO || New Client Connected to This id : 1rDSb9G-OjV17r-aAAAB || fastapiweb.py ||76
+Sep 2, 2024 - 12:53:04 || INFO || Received SDP offer || fastapiweb.py ||102
+Sep 2, 2024 - 12:53:04 || INFO || Track received video || fastapiweb.py ||107
+Sep 2, 2024 - 12:53:04 || INFO || Received ICE Candidate || fastapiweb.py ||133
+Sep 2, 2024 - 12:53:04 || INFO || Received ICE Candidate || fastapiweb.py ||133
+Sep 2, 2024 - 12:53:04 || INFO || Received ICE Candidate || fastapiweb.py ||133
+Sep 2, 2024 - 12:56:39 || INFO || Client disconnected:  1rDSb9G-OjV17r-aAAAB || fastapiweb.py ||84
+Sep 2, 2024 - 12:56:46 || INFO || FastAPI started || fastapiweb.py ||174
+Sep 2, 2024 - 12:56:47 || INFO || New Client Connected to This id : 53lop1g0saSO4oyJAAAB || fastapiweb.py ||76
+Sep 2, 2024 - 12:56:49 || INFO || Client disconnected:  53lop1g0saSO4oyJAAAB || fastapiweb.py ||84
+Sep 2, 2024 - 12:56:50 || INFO || New Client Connected to This id : XIS6JYmTehAyiySbAAAD || fastapiweb.py ||76
+Sep 2, 2024 - 12:56:51 || INFO || Received SDP offer || fastapiweb.py ||102
+Sep 2, 2024 - 12:56:51 || INFO || Track received video || fastapiweb.py ||107
+Sep 2, 2024 - 12:56:51 || INFO || Track added to PC || fastapiweb.py ||111
+Sep 2, 2024 - 12:56:51 || INFO || Received ICE Candidate || fastapiweb.py ||134
+Sep 2, 2024 - 12:56:51 || INFO || Received ICE Candidate || fastapiweb.py ||134
+Sep 2, 2024 - 12:56:51 || INFO || Received ICE Candidate || fastapiweb.py ||134
+Sep 2, 2024 - 12:57:01 || INFO || Client disconnected:  XIS6JYmTehAyiySbAAAD || fastapiweb.py ||84
+Sep 2, 2024 - 12:58:22 || INFO || FastAPI started || fastapiweb.py ||174
+Sep 2, 2024 - 12:58:23 || INFO || New Client Connected to This id : MgQZd4tyR47qDqEYAAAB || fastapiweb.py ||76
+Sep 2, 2024 - 12:58:25 || INFO || Received SDP offer || fastapiweb.py ||102
+Sep 2, 2024 - 12:58:25 || INFO || Track received video || fastapiweb.py ||107
+Sep 2, 2024 - 12:58:26 || INFO || Track added to PC || fastapiweb.py ||111
+Sep 2, 2024 - 12:58:26 || INFO || Received ICE Candidate || fastapiweb.py ||134
+Sep 2, 2024 - 12:58:26 || INFO || Received ICE Candidate || fastapiweb.py ||134
+Sep 2, 2024 - 12:58:26 || INFO || Received ICE Candidate || fastapiweb.py ||134
+Sep 2, 2024 - 12:58:39 || INFO || Client disconnected:  MgQZd4tyR47qDqEYAAAB || fastapiweb.py ||84
+Sep 2, 2024 - 12:58:52 || INFO || FastAPI started || fastapiweb.py ||174
+Sep 2, 2024 - 12:58:52 || INFO || New Client Connected to This id : fYvrzSXDW25lu219AAAB || fastapiweb.py ||76
+Sep 2, 2024 - 12:58:52 || INFO || Client disconnected:  fYvrzSXDW25lu219AAAB || fastapiweb.py ||84
+Sep 2, 2024 - 12:58:53 || INFO || New Client Connected to This id : xKOJ7RlrOO0QIjvRAAAD || fastapiweb.py ||76
+Sep 2, 2024 - 12:58:55 || INFO || Received SDP offer || fastapiweb.py ||102
+Sep 2, 2024 - 12:58:55 || INFO || Track received video || fastapiweb.py ||107
+Sep 2, 2024 - 12:58:55 || INFO || Track added to PC || fastapiweb.py ||111
+Sep 2, 2024 - 12:58:55 || INFO || Received ICE Candidate || fastapiweb.py ||134
+Sep 2, 2024 - 12:58:55 || INFO || Received ICE Candidate || fastapiweb.py ||134
+Sep 2, 2024 - 12:58:55 || INFO || Received ICE Candidate || fastapiweb.py ||134
+Sep 2, 2024 - 12:59:14 || INFO || Client disconnected:  xKOJ7RlrOO0QIjvRAAAD || fastapiweb.py ||84
