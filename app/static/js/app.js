@@ -22,6 +22,7 @@ let pc = null;
 let socket = null;
 let stream = null;
 let isStreaming = false;
+let object_detection = null
 
 
 /*
@@ -40,6 +41,16 @@ const videoSection = document.querySelector(".video-sec");
 /*
     * ----------------------------------------------------------Kullanılarn Frameworke Göre Arayüz Ayarlanıyor --------------------------------------------------------------------
 */
+
+fetch('/object_detect')   
+    .then(response => response.json())  
+    .then(data => { 
+        console.log(data)
+            object_detection = data.object_detection
+        })  
+    .catch(error => { 
+            console.error("Error fetching object detection status:", error); 
+    });
 
 
 connectSocket();
@@ -109,54 +120,64 @@ async function getMedia(deviceId) {
         if (stream) {
             stream.getTracks().forEach(track => track.stop());
         }
-        
+
         if (pc) {
             pc.close();
+            pc = null;
         }
 
         constraints.video.deviceId = { exact: deviceId };
-        
+
         stream = await navigator.mediaDevices.getUserMedia(constraints);
-        pc = new RTCPeerConnection(config);
 
-        pc.onicecandidate = (event) => {
-            if (event.candidate) {
-                log("New ICE candidate: " + JSON.stringify(event.candidate));
-                socket.emit('ice_candidate', {
-                    sdpMid: event.candidate.sdpMid,
-                    sdpMLineIndex: event.candidate.sdpMLineIndex,
-                    candidate: event.candidate.candidate
-                });
-            }
-        };
-
-        pc.oniceconnectionstatechange = () => {
-            log("ICE connection state: " + pc.iceConnectionState);
-        };
-
-        pc.ontrack = (event) => {
-            const incomingStream = event.streams[0];
-            if (incomingStream) {
-                if (remoteVideo.srcObject !== incomingStream) {
-                    remoteVideo.srcObject = incomingStream;
-                    log("Remote video stream set");
-                }
-            } else {
-                log("No streams available in the remote track event");
-            }
-        };
-
-        stream.getTracks().forEach(track => pc.addTrack(track, stream));
-
-        const offer = await pc.createOffer();
-        await pc.setLocalDescription(offer);
-        
-        log("Created and set local offer: " + JSON.stringify(offer));
-        socket.emit('sdp', { type: offer.type, sdp: offer.sdp });
+        if (object_detection === true) {
+            startWebRTC();
+        } else {
+            log("Object detection is disabled. Video is only displayed locally.");
+        }
 
     } catch (error) {
         log("Error in getMedia: " + error, 'error');
     }
+}
+
+function startWebRTC() {
+    pc = new RTCPeerConnection(config);
+
+    pc.oniceconnectionstatechange = () => {
+        log("ICE connection state: " + pc.iceConnectionState);
+    };
+
+    pc.onicecandidate = (event) => {
+        if (event.candidate) {
+            console.log("New ICE candidate:", JSON.stringify(event.candidate, null, 2));
+            log("New ICE candidate: " + JSON.stringify(event.candidate, null, 2));
+            socket.emit('ice_candidate', event.candidate);
+        }
+    };
+
+    pc.ontrack = (event) => {
+        const incomingStream = event.streams[0];
+        if (incomingStream) {
+            if (remoteVideo.srcObject !== incomingStream) {
+                remoteVideo.srcObject = incomingStream
+                log("Remote video stream set");
+            }
+        } else {
+            log("No streams available in the remote track event");
+        }
+    };
+
+    stream.getTracks().forEach(track => pc.addTrack(track, stream));
+
+    pc.createOffer().then(offer => {
+        return pc.setLocalDescription(offer);
+    }).then(() => {
+        log("Created and set local offer: " + JSON.stringify(pc.localDescription));
+        socket.emit('sdp', { type: pc.localDescription.type, sdp: pc.localDescription.sdp });
+    }).catch(error => {
+        log("Error creating or setting local description: " + error, 'error');
+    });
 }
 
 
