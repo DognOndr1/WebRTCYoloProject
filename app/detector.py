@@ -42,7 +42,7 @@ class Detector:
                     }
                 }
 
-                print(f"{class_id}")
+
 
                 detections.append(detection)
 
