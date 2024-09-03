@@ -5131,3 +5131,40 @@ Sep 2, 2024 - 14:13:23 || INFO || Received ICE Candidate || fastapiweb.py ||134
 Sep 2, 2024 - 14:14:46 || INFO || Client disconnected:  pXtzB9TEWOUNq7KMAAAT || fastapiweb.py ||84
 Sep 2, 2024 - 14:14:47 || INFO || Client disconnected:  AU2-_fSYgjKCHrdSAAAB || fastapiweb.py ||84
 Sep 2, 2024 - 14:14:47 || INFO || Client disconnected:  MrTxUXsPdSHg9dr5AAAD || fastapiweb.py ||84
+Sep 3, 2024 - 14:06:07 || INFO || FastAPI started || fastapiweb.py ||174
+Sep 3, 2024 - 14:06:08 || INFO || New Client Connected to This id : gnb1VGgH3LiBQ3fRAAAB || fastapiweb.py ||76
+Sep 3, 2024 - 14:06:09 || INFO || New Client Connected to This id : QToUrzz13LRsJ0sTAAAD || fastapiweb.py ||76
+Sep 3, 2024 - 14:06:10 || INFO || Client disconnected:  gnb1VGgH3LiBQ3fRAAAB || fastapiweb.py ||84
+Sep 3, 2024 - 14:06:13 || INFO || Received SDP offer || fastapiweb.py ||102
+Sep 3, 2024 - 14:06:13 || INFO || Track received video || fastapiweb.py ||107
+Sep 3, 2024 - 14:06:15 || INFO || Track added to PC || fastapiweb.py ||111
+Sep 3, 2024 - 14:06:15 || INFO || Received ICE Candidate || fastapiweb.py ||134
+Sep 3, 2024 - 14:06:15 || INFO || Received ICE Candidate || fastapiweb.py ||134
+Sep 3, 2024 - 14:06:15 || INFO || Received ICE Candidate || fastapiweb.py ||134
+Sep 3, 2024 - 14:06:15 || INFO || Received ICE Candidate || fastapiweb.py ||134
+Sep 3, 2024 - 14:06:15 || INFO || Received ICE Candidate || fastapiweb.py ||134
+Sep 3, 2024 - 14:06:15 || INFO || Received ICE Candidate || fastapiweb.py ||134
+Sep 3, 2024 - 14:06:31 || INFO || New Client Connected to This id : K17hFP2orZTxahsEAAAF || fastapiweb.py ||76
+Sep 3, 2024 - 14:06:45 || INFO || Client disconnected:  K17hFP2orZTxahsEAAAF || fastapiweb.py ||84
+Sep 3, 2024 - 14:06:45 || INFO || New Client Connected to This id : Dpph7bXf8slnz8tMAAAH || fastapiweb.py ||76
+Sep 3, 2024 - 14:06:54 || INFO || Client disconnected:  Dpph7bXf8slnz8tMAAAH || fastapiweb.py ||84
+Sep 3, 2024 - 14:06:54 || INFO || New Client Connected to This id : SS7DLKnCmZtKBRWCAAAJ || fastapiweb.py ||76
+Sep 3, 2024 - 14:07:09 || INFO || Client disconnected:  SS7DLKnCmZtKBRWCAAAJ || fastapiweb.py ||84
+Sep 3, 2024 - 14:07:12 || INFO || New Client Connected to This id : Az2nVwYIHARdPMG7AAAL || fastapiweb.py ||76
+Sep 3, 2024 - 14:07:16 || INFO || Client disconnected:  Az2nVwYIHARdPMG7AAAL || fastapiweb.py ||84
+Sep 3, 2024 - 14:07:16 || INFO || New Client Connected to This id : 3k3qPE7MeasRcAQzAAAN || fastapiweb.py ||76
+Sep 3, 2024 - 14:07:28 || INFO || New Client Connected to This id : 7hxSyKK1BsHziN1JAAAP || fastapiweb.py ||76
+Sep 3, 2024 - 14:07:31 || INFO || Client disconnected:  7hxSyKK1BsHziN1JAAAP || fastapiweb.py ||84
+Sep 3, 2024 - 14:07:31 || INFO || New Client Connected to This id : 3mK-fnMJgGkHiALbAAAR || fastapiweb.py ||76
+Sep 3, 2024 - 14:07:48 || INFO || Client disconnected:  3mK-fnMJgGkHiALbAAAR || fastapiweb.py ||84
+Sep 3, 2024 - 14:07:48 || INFO || New Client Connected to This id : hkUMEXC1bTbFgMuNAAAT || fastapiweb.py ||76
+Sep 3, 2024 - 14:08:01 || INFO || Client disconnected:  3k3qPE7MeasRcAQzAAAN || fastapiweb.py ||84
+Sep 3, 2024 - 14:08:08 || INFO || Client disconnected:  hkUMEXC1bTbFgMuNAAAT || fastapiweb.py ||84
+Sep 3, 2024 - 14:08:08 || INFO || New Client Connected to This id : FoEiWBMKZ9q8Cx9eAAAV || fastapiweb.py ||76
+Sep 3, 2024 - 14:08:13 || INFO || Client disconnected:  FoEiWBMKZ9q8Cx9eAAAV || fastapiweb.py ||84
+Sep 3, 2024 - 14:08:13 || INFO || New Client Connected to This id : PeFEE1Pcvv5NRWmfAAAX || fastapiweb.py ||76
+Sep 3, 2024 - 14:08:16 || INFO || Client disconnected:  PeFEE1Pcvv5NRWmfAAAX || fastapiweb.py ||84
+Sep 3, 2024 - 14:08:16 || INFO || New Client Connected to This id : 2OktMqGk7FXC7EgvAAAZ || fastapiweb.py ||76
+Sep 3, 2024 - 14:08:29 || INFO || Client disconnected:  QToUrzz13LRsJ0sTAAAD || fastapiweb.py ||84
+Sep 3, 2024 - 14:08:29 || INFO || Client disconnected:  2OktMqGk7FXC7EgvAAAZ || fastapiweb.py ||84
+Sep 3, 2024 - 14:08:29 || ERROR || Server failed to start: Event CloseConnection(code=1012, reason=None) cannot be sent in state ConnectionState.LOCAL_CLOSING. || main.py ||47
