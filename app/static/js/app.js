@@ -295,20 +295,18 @@ async function start() {
             pc.close();
             pc = null;
         }
-        const selectedDeviceId = deviceSelect.value; // Seçilen Medya Cihazı ID'sini Alma
+        const selectedDeviceId = deviceSelect.value;
         if (selectedDeviceId) {
             await getMedia(selectedDeviceId);
             log("Video stream started");
 
-            // Show the loader
             loader.classList.add("loader");
 
-            // Wait for 5 seconds before starting the detection
             timeoutId = setTimeout(() => {
                 loader.classList.remove("loader");
                 delay = false; // Allow detection drawing
                 log("Detection started after 5 seconds");
-            }, 10000); // 10000 milliseconds = 10 seconds
+            }, 10000);
             
         } else {
             log("No video device selected", 'warning');
