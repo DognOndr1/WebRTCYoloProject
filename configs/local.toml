@@ -7,7 +7,7 @@ object_detection = true
 use_cuda = true
 
 [API]
-chosen_api = "Fast"
+chosen_api = "aiohttp"
 
 [Static]
 static_directory = "app/static"

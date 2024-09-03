@@ -1,6 +1,3 @@
-/*
-    * -----------------------------------------------------------------------STUN / TURN Sunucuları Ayarlanıyor --------------------------------------------------------------------
-*/
 const config = {
     iceServers: [
         {
@@ -9,25 +6,10 @@ const config = {
     ]
 };
 
-
-/*
-    * -----------------------------------------------------------------------Kullanılacak Medya Akışları Belirleniyor --------------------------------------------------------------------
-*/
 const constraints = {
     video: { deviceId: undefined }, 
     audio: false
 };
-
-let pc = null;
-let socket = null;
-let stream = null;
-let isStreaming = false;
-let object_detection = null
-
-
-/*
-    * -----------------------------------------------------------------------HTML Elementleri ALınıyor --------------------------------------------------------------------
-*/
 const startBtn = document.querySelector("button#startButton");
 const stopBtn = document.querySelector("button#stopButton");
 const remoteVideo = document.querySelector("video#remoteVideo");
@@ -36,11 +18,12 @@ const toggleButton = document.querySelector("#toggleButton");
 const deviceSelect = document.getElementById("devices");
 const detectorSection = document.querySelector(".detector-section")
 const videoSection = document.querySelector(".video-sec");
+let pc = null;
+let socket = null;
+let stream = null;
+let isStreaming = false;
+let object_detection = null
 
-
-/*
-    * ----------------------------------------------------------Kullanılarn Frameworke Göre Arayüz Ayarlanıyor --------------------------------------------------------------------
-*/
 
 fetch('/object_detect')   
     .then(response => response.json())  
@@ -53,13 +36,6 @@ fetch('/object_detect')
     });
 
 
-connectSocket();
-getConnectedDevices();
-
-
-/*
-    * ---------------------------------------------------------------Filtre Butonu CSS Özellikleri Ayarlanıyor --------------------------------------------------------------------
-*/
 async function toggleStream() {
     if (isStreaming) {
         await stop();
@@ -74,47 +50,42 @@ async function toggleStream() {
     }
 }
 
-
-/*
-    * ----------------------------------------------------------------------Socket IO Ayarları Yapılıyor --------------------------------------------------------------------
-*/
 function connectSocket() {
-    socket = io(); 
 
-    socket.on('connect', () => {
-        log('Connected to server');
-    });
+        socket = io(); 
 
-    socket.on('disconnect', () => {
-        log('Disconnected from server');
-    });
-
-    socket.on('ice_candidate', async (candidate) => {
-        log("Received ICE candidate from server: " + JSON.stringify(candidate));
-        try {
-            const rtcCandidate = new RTCIceCandidate(candidate);
-            await pc.addIceCandidate(rtcCandidate);
-            log("Successfully added ICE candidate from server");
-        } catch (error) {
-            log("Error adding received ICE candidate: " + error, 'error');
-        }
-    });
-
-    socket.on('sdp_answer', async (answer) => {
-        log("Received SDP Answer from server: " + JSON.stringify(answer));
-        try {
-            await pc.setRemoteDescription(new RTCSessionDescription(answer));
-            log("Set Remote Answer");
-        } catch (error) {
-            log("Error setting remote description: " + error, 'error');
-        }
-    });
+        socket.on('connect', () => {
+            mySID = socket.id; 
+            console.log("My SID:", mySID);
+            cameraPermission();
+        });
+    
+        socket.on('disconnect', () => {
+            log('Disconnected from server');
+        });
+    
+        socket.on('ice_candidate', async (candidate) => {
+            log("Received ICE candidate from server: " + JSON.stringify(candidate));
+            try {
+                const rtcCandidate = new RTCIceCandidate(candidate);
+                await pc.addIceCandidate(rtcCandidate);
+                log("Successfully added ICE candidate from server");
+            } catch (error) {
+                log("Error adding received ICE candidate: " + error, 'error');
+            }
+        });
+    
+        socket.on('sdp_answer', async (answer) => {
+            log("Received SDP Answer from server: " + JSON.stringify(answer));
+            try {
+                await pc.setRemoteDescription(new RTCSessionDescription(answer));
+                log("Set Remote Answer");
+            } catch (error) {
+                log("Error setting remote description: " + error, 'error');
+            }
+        });
 }
 
-
-/*
-    * -----------------------------------------------------------------------WebRTC İşlemleri Yapılıyor--------------------------------------------------------------------
-*/
 async function getMedia(deviceId) {
     try {
         if (stream) {
@@ -181,22 +152,27 @@ function startWebRTC() {
     });
 }
 
-
-/*
-    * -----------------------------------------------------------------------Bağlı ve Dahili Medya Cihazları --------------------------------------------------------------------
-*/
-function getConnectedDevices() {
-    navigator.mediaDevices.enumerateDevices()
-    .then(devices => {
+async function getConnectedDevices() {
+    try {
+        const devices = await navigator.mediaDevices.enumerateDevices();
         const filtered = devices.filter(device => device.kind === 'videoinput');
-        deviceSelect.innerHTML = ''; // Clear existing options
+        deviceSelect.innerHTML = ''; 
         filtered.forEach(device => {
             addOptionToSelect(device.label || `Camera ${filtered.indexOf(device) + 1}`, device.deviceId);
         });
-    });
+        
+        // Eğer hiç kamera bulunamazsa, kullanıcıya bilgi ver
+        if (filtered.length === 0) {
+            log("No cameras found. Please check your camera permissions and connections.", 'warning');
+        } else {
+            log("Cameras listed successfully.");
+        }
+    } catch (error) {
+        console.log("Error enumerating devices: " + error);
+        log("Error listing cameras. Please refresh the page and try again.", 'error');
+    }
 }
 
-///////////////////////
 function addOptionToSelect(optionText, optionValue) {
     const option = document.createElement("option");
     option.text = optionText;
@@ -204,17 +180,13 @@ function addOptionToSelect(optionText, optionValue) {
     deviceSelect.appendChild(option);
 }
 
-
-/*
-    * -----------------------------------------------------------------------HTML Elementleri ALınıyor --------------------------------------------------------------------
-*/
 async function start() {
     try {
         if (pc) {
             pc.close();
             pc = null;
         }
-        const selectedDeviceId = deviceSelect.value; // Seçilen Medya Cihazı ID'sini Alma
+        const selectedDeviceId = deviceSelect.value; 
         if (selectedDeviceId) {
             await getMedia(selectedDeviceId);
             log("Video stream started");
@@ -244,16 +216,34 @@ function stop() {
     log("Video stream stopped");
 }
 
-
-
-
 toggleButton.addEventListener("click", toggleStream);
 
 log("Script loaded. Click the start button to begin.");
 
-/*
-    * -----------------------------------------------------------------------HTML Elementleri ALınıyor --------------------------------------------------------------------
-*/
+
+async function cameraPermission() {
+    try {
+        const result = await navigator.permissions.query({name: "camera"})
+        if(result.state === "granted"){
+            await getConnectedDevices()
+        } else {
+            await StartVideoForPerm()
+        }
+    } catch (error) {
+        console.log("Error checking camera permission: " + error)
+        await StartVideoForPerm()
+    }
+}
+
+async function StartVideoForPerm() {
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({'video': true})
+        stream.getTracks().forEach(track => track.stop())
+        await getConnectedDevices()
+    } catch (error) {
+        console.log("Error getting camera permission: " + error)
+    }
+}
 
 function log(message, level = 'info') {
     console.log(message);
@@ -276,3 +266,5 @@ function log(message, level = 'info') {
     logsContainer.appendChild(logEntry);
     logsContainer.scrollTop = logsContainer.scrollHeight;
 }
+
+connectSocket()

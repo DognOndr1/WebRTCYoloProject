@@ -4,9 +4,9 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from dataclasses import dataclass
 from typing import Any
-import uvicorn, cv2
+import uvicorn
 from fastapi.responses import JSONResponse
-import cv2,os
+import os
 import numpy as np
 
 from aiortc import (
@@ -30,20 +30,7 @@ else:
 
 @dataclass
 class FastAPIWebServer(WebServer):
-    host: str
-    port: int
-    is_active: bool
-    debug: bool
-    object_detection: bool
-    use_cuda: bool
-    static_directory: str = None
-    temp_directory: str = None
-    pcs: dict = None
-    logger: Any = None
-    socket_app: Any = None
-    ssl_cert: str = None
-    ssl_key: str = None
-
+    
     def __post_init__(self):
         self.env: str = "local.toml"
         self.sio = socketio.AsyncServer(cors_allowed_origins="*", async_mode="asgi")
@@ -106,10 +93,9 @@ class FastAPIWebServer(WebServer):
             def on_track(track):
                 self.logger.info(f"Track received {track.kind}")
                 if track.kind == "video":
-                    print("Gray Track Mesajı")
-                    gray_track = GrayVideoStreamTrack(self.relay.subscribe(track), use_cuda=self.use_cuda)
+                    object_detect = ObjectDetection(self.relay.subscribe(track), use_cuda=self.use_cuda)
                     self.logger.info("Track added to PC")
-                    pc.addTrack(gray_track)
+                    pc.addTrack(object_detect)
 
             await pc.setRemoteDescription(offer)
             answer = await pc.createAnswer()
@@ -162,22 +148,14 @@ class FastAPIWebServer(WebServer):
             else:
                 print(f"No RTCPeerConnection found for sid: {sid}")
 
-        module_directory = os.path.dirname(os.path.abspath(__file__))
-        self.ssl_cert = os.path.join(module_directory, "..", "cert.pem")
-        self.ssl_key = os.path.join(module_directory, "..", "key.pem")
-
-        ssl_context = None
-        if self.ssl_cert and self.ssl_key:
-            ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
-            ssl_context.load_cert_chain(certfile=self.ssl_cert, keyfile=self.ssl_key)
 
         self.logger.info("FastAPI started")
         uvicorn.run(
             self.socket_app,
             host=self.host,
             port=self.port,
-            ssl_keyfile=self.ssl_key,
-            ssl_certfile=self.ssl_cert,
+            ssl_keyfile="./key.pem",
+            ssl_certfile="./cert.pem",
         )
 
     @check_active_decorator
@@ -185,7 +163,7 @@ class FastAPIWebServer(WebServer):
         self.server()
 
 
-class GrayVideoStreamTrack(VideoStreamTrack):
+class ObjectDetection(VideoStreamTrack):
     def __init__(self, track,use_cuda):
         super().__init__()
         self.track = track
@@ -245,15 +223,19 @@ if __name__ == "__main__":
     ssl_key = os.path.join(module_directory, "..", "key.pem")
 
     fastapiweb = FastAPIWebServer(
-        "0.0.0.0",
-        8000,
-        True,
-        True,
+        host="0.0.0.0",
+        port=8000,
+        is_active=True,
+        debug=True,
         static_directory="static",
         temp_directory="templates",
         logger=Logger(**logger_configs),
-        ssl_cert=ssl_cert,
-        ssl_key=ssl_key,
+        pcs={},
+        ssl_cert="../cert.pem",  
+        ssl_key="../key.pem",
+        object_detection=True,
+        use_cuda=True
     )
+        
 
     fastapiweb.run()

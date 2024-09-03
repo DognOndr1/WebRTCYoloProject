@@ -1,4 +1,4 @@
-import ssl, json, cv2, socketio, aiohttp_jinja2, jinja2
+import ssl, json, socketio, aiohttp_jinja2, jinja2
 from typing import Any
 from dataclasses import dataclass
 from aiohttp import web
@@ -12,7 +12,6 @@ from aiortc import (
 )
 from av import VideoFrame
 from aiortc.contrib.media import MediaRelay
-import cv2,os
 import numpy as np
 
 if __name__ == "__main__":
@@ -27,16 +26,6 @@ else:
 
 @dataclass
 class AIOHTTPWeb(WebServer):
-    host: str
-    port: int
-    is_active: bool
-    debug: bool
-    static_directory: str = None
-    temp_directory: str = None
-    logger: Any = None
-    pcs: dict = None
-    ssl_cert: str = None
-    ssl_key: str = None
 
     def __post_init__(self):
         self.sio = socketio.AsyncServer(cors_allowed_origins="*")
@@ -103,9 +92,8 @@ class AIOHTTPWeb(WebServer):
             def on_track(track):
                 print(f"Track received: {track.kind}")
                 if track.kind == "video":
-                    gray_track = GrayVideoStreamTrack(self.relay.subscribe(track))
-                    print("Track added to pc")
-                    pc.addTrack(gray_track)
+                    object_detect = ObjectDetection(self.relay.subscribe(track),use_cuda=self.use_cuda)
+                    pc.addTrack(object_detect)
 
             await pc.setRemoteDescription(offer)
             answer = await pc.createAnswer()
@@ -163,19 +151,20 @@ class AIOHTTPWeb(WebServer):
 
         async def get_framework(request):
             return web.json_response({"framework": "aiohttp"})
+        
+        async def get_obj(request):
+            return web.json_response({"object_detection": self.object_detection})
 
         self.app.router.add_get("/", home)
         self.app.router.add_get("/framework", get_framework)
+        self.app.router.add_get("/object_detect", get_obj)
         self.register_socket_events()
 
-        module_directory = os.path.dirname(os.path.abspath(__file__))
-        self.ssl_cert = os.path.join(module_directory, "..", "cert.pem")
-        self.ssl_key = os.path.join(module_directory, "..", "key.pem")
 
         ssl_context = None
         if self.ssl_cert and self.ssl_key:
             ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
-            ssl_context.load_cert_chain(certfile=self.ssl_cert, keyfile=self.ssl_key)
+            ssl_context.load_cert_chain(certfile="./cert.pem", keyfile="./key.pem")
 
         web.run_app(self.app, host=self.host, port=self.port, ssl_context=ssl_context)
 
@@ -184,24 +173,21 @@ class AIOHTTPWeb(WebServer):
         self.server()
 
 
-class GrayVideoStreamTrack(VideoStreamTrack):
-    def __init__(self, track):
+class ObjectDetection(VideoStreamTrack):
+    def __init__(self, track,use_cuda):
         super().__init__()
         self.track = track
-        self.detector = Detector()
+        self.detector = Detector(use_cuda=use_cuda)
 
     async def recv(self):
-        frame = await self.track.recv()  # Alınan çerçeve
+        frame = await self.track.recv() 
         if not isinstance(frame, VideoFrame):
             raise ValueError("Frame is not a VideoFrame")
 
-        # Convert frame to numpy array
         img = np.array(frame.to_ndarray(format="bgr24"))
 
-        # Process frame using detector
         processed_frame = self.detector.process_frame(img)
 
-        # Convert processed frame back to VideoFrame
         if processed_frame is None or not isinstance(processed_frame, np.ndarray):
             raise ValueError("Processed frame is None or not a numpy array")
 
@@ -228,11 +214,6 @@ def parse_candidate(candidate_str):
 
 if __name__ == "__main__":
 
-
-    module_directory = os.path.dirname(os.path.abspath(__file__))
-    ssl_cert = os.path.join(module_directory, "..", "cert.pem")
-    ssl_key = os.path.join(module_directory, "..", "key.pem")
-
     web_server = AIOHTTPWeb(
         host="0.0.0.0",
         port=8000,
@@ -242,8 +223,10 @@ if __name__ == "__main__":
         temp_directory="templates",
         logger=None,
         pcs={},
-        ssl_cert=ssl_cert,  
-        ssl_key=ssl_key,
+        ssl_cert="../cert.pem",  
+        ssl_key="../key.pem",
+        object_detection=True,
+        use_cuda=True
     )
 
     web_server.run()

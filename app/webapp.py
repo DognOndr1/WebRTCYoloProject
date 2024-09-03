@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from typing import Any
 
 @dataclass
 class WebServer(ABC):
@@ -28,6 +29,15 @@ class WebServer(ABC):
     port: int
     is_active: bool
     debug: bool
+    object_detection: bool
+    use_cuda: bool
+    static_directory: str = None
+    temp_directory: str = None
+    pcs: dict = None
+    logger: Any = None
+    ssl_cert: str = None
+    ssl_key: str = None
+    socket_app: Any = None
 
     def __post_init__(self):
         assert isinstance(self.host, str) and self.host, "Host, bir string olmalı ve boş olmamalıdır."
