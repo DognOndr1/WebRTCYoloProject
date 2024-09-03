@@ -6,7 +6,7 @@ is_active = true
 object_detection = true
 
 [API]
-chosen_api = "aiohttp"
+chosen_api = "Fast"
 
 [Static]
 static_directory = "app/static"

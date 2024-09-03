@@ -14,6 +14,7 @@ from aiortc import (
     RTCSessionDescription,
     RTCIceCandidate,
     VideoStreamTrack,
+    RTCDataChannel
 )
 from av import VideoFrame
 from aiortc.contrib.media import MediaRelay
@@ -57,6 +58,9 @@ class FastAPIWebServer(WebServer):
         if self.pcs is None:
             self.pcs = {}
 
+
+
+
     def server(self):
         @self.app.get("/")
         async def home(request: Request):
@@ -97,12 +101,18 @@ class FastAPIWebServer(WebServer):
             self.logger.info("Received SDP offer")
             print(json.dumps(data, indent=2))
 
+            @pc.on("datachannel")
+            def on_datachannel(channel):
+                @channel.on("message")
+                def on_message(message):
+                        channel.send("pong" + message[4:])
+
             @pc.on("track")
             def on_track(track):
                 self.logger.info(f"Track received {track.kind}")
                 if track.kind == "video":
                     print("Object Track Mesajı")
-                    object_track = ObjectDetection(self.relay.subscribe(track),self.sio,sid=sid)
+                    object_track = ObjectDetection(self.relay.subscribe(track), self.sio, sid=sid)
                     self.logger.info("Track added to PC")
                     pc.addTrack(object_track)
 
@@ -122,6 +132,7 @@ class FastAPIWebServer(WebServer):
                 {"sdp": pc.localDescription.sdp, "type": pc.localDescription.type},
                 to=sid,
             )
+        
 
         @self.sio.on("ice_candidate")
         async def handle_ice_candidate(sid, data):
@@ -160,10 +171,6 @@ class FastAPIWebServer(WebServer):
         module_directory = os.path.dirname(os.path.abspath(__file__))
         self.ssl_cert = os.path.join(module_directory, "..", "cert.pem")
         self.ssl_key = os.path.join(module_directory, "..", "key.pem")
-        ssl_context = None
-        if self.ssl_cert and self.ssl_key:
-            ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
-            ssl_context.load_cert_chain(certfile=self.ssl_cert, keyfile=self.ssl_key)
 
         ssl_context = None
         if self.ssl_cert and self.ssl_key:

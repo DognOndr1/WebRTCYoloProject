@@ -19,6 +19,8 @@ let stream = null;
 let isStreaming = false;
 let deviceType = getDeviceType();
 let object_detection = false
+let dc, dcInterval = null
+
 const loader = document.querySelector(".loading");
 
 // !----------------------------------------------------------------Cihaz Türünü Belirleme----------------------------------------------------------------
@@ -220,6 +222,47 @@ async function getMedia(deviceId) {
 function startWebRTC() {
     pc = new RTCPeerConnection(config);
 
+    var time_start = null;
+
+    const current_stamp = () => {
+        if (time_start === null) {
+            time_start = new Date().getTime();
+            return 0;
+        } else {
+            return new Date().getTime() - time_start;
+        }
+    };
+    
+    dc = pc.createDataChannel('chat');
+
+    // DataChannel kapandığında interval temizleniyor
+    dc.addEventListener('close', () => {
+        console.log('DataChannel kapandı');
+        clearInterval(dcInterval);
+    });
+    
+    // DataChannel açıldığında, ping mesajları gönderiliyor
+    dc.addEventListener('open', () => {
+        console.log('DataChannel açıldı');
+        dcInterval = setInterval(() => {
+            var message = 'ping ' + current_stamp();
+            console.log('Ping mesajı gönderildi: ' + message);
+            dc.send(message);
+        }, 1);
+    });
+    
+    // DataChannel üzerinden mesaj alındığında
+    dc.addEventListener('message', (evt) => {
+        console.log('Mesaj alındı: ' + evt.data);
+    
+        if (evt.data.substring(0, 4) === 'pong') {
+            var elapsed_ms = current_stamp() - parseInt(evt.data.substring(5), 10);
+            console.log('Pong mesajı alındı, gecikme süresi: ' + elapsed_ms + ' ms');
+        }
+    });
+
+    
+    
     pc.oniceconnectionstatechange = () => {
         log("ICE connection state: " + pc.iceConnectionState);
     };
