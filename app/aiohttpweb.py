@@ -1,5 +1,4 @@
 import ssl, json, socketio, aiohttp_jinja2, jinja2
-from typing import Any
 from dataclasses import dataclass
 from aiohttp import web
 from aiortc import (
@@ -148,15 +147,11 @@ class AIOHTTPWeb(WebServer):
     def server(self):
         async def home(request):
             return aiohttp_jinja2.render_template("index.html", request, {})
-
-        async def get_framework(request):
-            return web.json_response({"framework": "aiohttp"})
         
         async def get_obj(request):
             return web.json_response({"object_detection": self.object_detection})
 
         self.app.router.add_get("/", home)
-        self.app.router.add_get("/framework", get_framework)
         self.app.router.add_get("/object_detect", get_obj)
         self.register_socket_events()
 
@@ -164,7 +159,7 @@ class AIOHTTPWeb(WebServer):
         ssl_context = None
         if self.ssl_cert and self.ssl_key:
             ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
-            ssl_context.load_cert_chain(certfile="./cert.pem", keyfile="./key.pem")
+            ssl_context.load_cert_chain(certfile=self.ssl_cert, keyfile=self.ssl_key)
 
         web.run_app(self.app, host=self.host, port=self.port, ssl_context=ssl_context)
 

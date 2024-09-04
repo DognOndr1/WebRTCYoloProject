@@ -5489,3 +5489,6 @@ Sep 3, 2024 - 15:36:03 || INFO || New Client Connected to This id : CjXq2QV06k7d
 Sep 3, 2024 - 15:36:04 || INFO || New Client Connected to This id : ktMlqbS27RER5RafAAAD || fastapiweb.py ||63
 Sep 3, 2024 - 15:36:05 || INFO || Client disconnected:  ktMlqbS27RER5RafAAAD || fastapiweb.py ||71
 Sep 3, 2024 - 15:36:05 || INFO || Client disconnected:  CjXq2QV06k7dxdDdAAAB || fastapiweb.py ||71
+Sep 4, 2024 - 10:38:48 || INFO || FastAPI started || fastapiweb.py ||152
+Sep 4, 2024 - 10:39:23 || INFO || FastAPI started || fastapiweb.py ||152
+Sep 4, 2024 - 10:43:51 || INFO || FastAPI started || fastapiweb.py ||146

@@ -1,12 +1,10 @@
 from fastapi import FastAPI, Request
-import socketio, json, ssl
+import socketio, json
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from dataclasses import dataclass
-from typing import Any
 import uvicorn
 from fastapi.responses import JSONResponse
-import os
 import numpy as np
 
 from aiortc import (
@@ -48,10 +46,6 @@ class FastAPIWebServer(WebServer):
         @self.app.get("/")
         async def home(request: Request):
             return self.templates.TemplateResponse("index.html", {"request": request})
-
-        @self.app.get("/framework")
-        async def get_framework():
-            return JSONResponse({"framework": "fastapi"})
         
         @self.app.get("/object_detect")
         async def get_framework():
@@ -154,8 +148,8 @@ class FastAPIWebServer(WebServer):
             self.socket_app,
             host=self.host,
             port=self.port,
-            ssl_keyfile="./key.pem",
-            ssl_certfile="./cert.pem",
+            ssl_keyfile=self.ssl_key,
+            ssl_certfile=self.ssl_cert,
         )
 
     @check_active_decorator
@@ -217,10 +211,6 @@ if __name__ == "__main__":
         "log_format": "<green>{time:MMM D, YYYY - HH:mm:ss}</green> || <level>{level}</level> || <red>{file.name}</red> || <cyan>{message}</cyan>||",
         "rotation": "10MB",
     }
-
-    module_directory = os.path.dirname(os.path.abspath(__file__))
-    ssl_cert = os.path.join(module_directory, "..", "cert.pem")
-    ssl_key = os.path.join(module_directory, "..", "key.pem")
 
     fastapiweb = FastAPIWebServer(
         host="0.0.0.0",

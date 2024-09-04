@@ -82,6 +82,19 @@ If you prefer not to use Conda, you can install the necessary packages using `pi
 
 # How to run code 
 
+## Before Run You Need SSL KEY and CERTIFICATE
+
+**You can use this line of code**
+``` 
+    First make sure you are in the project directory
+```
+
+```bash
+openssl genpkey -algorithm RSA -out key.pem -pass pass:
+openssl req -new -x509 -key key.pem -out cert.pem -days 365 -subj /CN=example.com -passin pass:
+```
+
+
 ## Running `main.py`
 to start the application using `main.py`, open a terminal and run:
 

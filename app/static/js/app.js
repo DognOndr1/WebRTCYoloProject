@@ -51,7 +51,6 @@ async function toggleStream() {
 }
 
 function connectSocket() {
-
         socket = io(); 
 
         socket.on('connect', () => {
