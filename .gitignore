@@ -49,7 +49,7 @@ coverage.xml
 # pyenv
 .python-version
 
-# celery beat schedule file
+# Celery beat schedule file
 celerybeat-schedule
 
 # SageMath parsed files
@@ -75,9 +75,6 @@ ENV/
 # mypy
 .mypy_cache/
 
+# Certificates
 key.pem
 cert.pem
-
-women.jpg
-yoloboxes.py
-yolov8n.pt

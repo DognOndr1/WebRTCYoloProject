@@ -2,13 +2,13 @@ aiohttp==3.10.5
 aiohttp_jinja2==1.6
 aiortc==1.9.0
 av==12.3.0
-fastapi==0.112.1
+fastapi==0.112.2
 Flask==3.0.3
 Jinja2==3.1.4
 loguru==0.7.2
-opencv_python==4.10.0.84
-pydantic==2.8.2
-python-socketio==5.11.3
+numpy==1.24.4
+python-socketio==5.11.4
 toml==0.10.2
+torch==2.4.0
 ultralytics==8.2.79
 uvicorn==0.30.6

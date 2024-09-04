@@ -104,7 +104,29 @@ You can check with this: `nvidi-smi`
 *Once the CUDA installation is complete, our project will automatically utilize the GPU. If you encounter any issues, please refer to NVIDIA's official documentation*
 
 
-# How to run code 
+# How to run code
+
+### Before Run You Need SSL KEY and CERTIFICATE
+
+**You can use this line of code**
+``` 
+    First make sure you are in the project directory
+```
+
+```bash
+openssl genpkey -algorithm RSA -out key.pem -pass pass:
+openssl req -new -x509 -key key.pem -out cert.pem -days 365 -subj /CN=example.com -passin pass:
+```
+
+or 
+
+```bash
+openssl req -new -x509 -key key.pem -out cert.pem -days 365 -subj "/C=US/ST=California/L=San Francisco/O=MyCompany/OU=IT/CN=example.com/emailAddress=admin@example.com"
+```
+
+
+
+
 
 ## Running `main.py`
 to start the application using `main.py`, open a terminal go to project directory and run:
