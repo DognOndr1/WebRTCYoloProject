@@ -12,7 +12,7 @@ const constraints = {
     video: { deviceId: undefined }, 
     audio: false
 };
-
+// !--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 let pc = null;
 let socket = null;
 let stream = null;
@@ -20,8 +20,9 @@ let isStreaming = false;
 let deviceType = getDeviceType();
 let object_detection = false
 let dc, dcInterval = null
-
-const loader = document.querySelector(".loading");
+let mySID = null;
+let delay;
+let timeoutId;
 
 // !----------------------------------------------------------------Cihaz Türünü Belirleme----------------------------------------------------------------
 function getDeviceType() {
@@ -39,6 +40,7 @@ const remoteVideo = document.querySelector("video.remoteVideo");
 const logsContainer = document.querySelector(".logs");
 const toggleButton = document.querySelector("#toggleButton");
 const deviceSelect = document.getElementById("devices");
+const loader = document.querySelector(".loading");
 
 // !---------------------------------------------------------------Filtre Butonu CSS Özellikleri Ayarlanıyor----------------------------------------------------------------
 async function toggleStream() {
@@ -55,10 +57,10 @@ async function toggleStream() {
     }
 }
 
+// !----------------------------------------------------------------Canvas Boyutunu Güncelleme----------------------------------------------------------------
 const canvas = document.getElementById('canvas');
 let ctx = canvas.getContext('2d');
 
-// !----------------------------------------------------------------Canvas Boyutunu Güncelleme----------------------------------------------------------------
 function updateCanvasSize() {
     const videoRect = remoteVideo.getBoundingClientRect();
     const videoWidth = videoRect.width;
@@ -87,8 +89,6 @@ fetch('/object_detect')
     .catch(error => { 
             console.error("Error fetching object detection status:", error); 
     });
-
-let mySID = null;
 
 // !----------------------------------------------------------------Socket Bağlantısını Yapma----------------------------------------------------------------
 function connectSocket() {
@@ -186,30 +186,6 @@ function startWebRTC() {
     
     dc = pc.createDataChannel('chat');
 
-    dc.addEventListener('close', () => {
-        console.log('DataChannel kapandı');
-        clearInterval(dcInterval);
-    });
-    
-    dc.addEventListener('open', () => {
-        console.log('DataChannel açıldı');
-        dcInterval = setInterval(() => {
-            var message = 'ping ' + current_stamp();
-            console.log('Ping mesajı gönderildi: ' + message);
-            dc.send(message);
-        }, 10);
-    });
-
-    dc.addEventListener('message', (evt) => {
-        console.log('Mesaj alındı: ' + evt.data);
-    
-        if (evt.data.substring(0, 4) === 'pong') {
-            var elapsed_ms = current_stamp() - parseInt(evt.data.substring(5), 10);
-            console.log('Pong mesajı alındı, gecikme süresi: ' + elapsed_ms + ' ms');
-        }
-    });
-
-
     pc.ondatachannel = function(event) {
         const dc = event.channel;
         dc.onmessage = function(evt) {
@@ -258,7 +234,6 @@ function startWebRTC() {
         };
     };
     
-    
     pc.oniceconnectionstatechange = () => {
         log("ICE connection state: " + pc.iceConnectionState);
     };
@@ -304,7 +279,6 @@ async function getConnectedDevices() {
             addOptionToSelect(device.label || `Camera ${filtered.indexOf(device) + 1}`, device.deviceId);
         });
         
-        // Eğer hiç kamera bulunamazsa, kullanıcıya bilgi ver
         if (filtered.length === 0) {
             log("No cameras found. Please check your camera permissions and connections.", 'warning');
         } else {
@@ -324,10 +298,7 @@ function addOptionToSelect(optionText, optionValue) {
     deviceSelect.appendChild(option);
 }
 
-let delay;
-let timeoutId;
-
-// !----------------------------------------------------------------HTML Elementleri Alınıyor----------------------------------------------------------------
+// !----------------------------------------------------------------Start Stop Function----------------------------------------------------------------
 async function start() {
     try {
         if (pc) {
@@ -343,9 +314,9 @@ async function start() {
 
             timeoutId = setTimeout(() => {
                 loader.classList.remove("loader");
-                delay = false; // Allow detection drawing
-                log("Detection started after 5 seconds");
-            }, 10000);
+                delay = false; 
+                log("Detection started after 20 seconds");
+            }, 20000);
             
         } else {
             log("No video device selected", 'warning');
@@ -424,11 +395,8 @@ async function StartVideoForPerm() {
     try {
         const stream = await navigator.mediaDevices.getUserMedia({'video': true})
         stream.getTracks().forEach(track => track.stop())
-        // İzin alındıktan sonra cihazları yeniden listele
         await getConnectedDevices()
     } catch (error) {
         console.log("Error getting camera permission: " + error)
     }
 }
-
-connectSocket()

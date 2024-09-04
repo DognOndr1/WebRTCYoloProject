@@ -3,21 +3,17 @@ import socketio, json, ssl
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from dataclasses import dataclass
-from typing import Any
-import uvicorn, cv2
+import uvicorn
 from fastapi.responses import JSONResponse
-import cv2,os
 import numpy as np
-
 from aiortc import (
     RTCPeerConnection,
     RTCSessionDescription,
     RTCIceCandidate,
     VideoStreamTrack,
-    RTCDataChannel
 )
-from av import VideoFrame
 from aiortc.contrib.media import MediaRelay
+from av import VideoFrame
 
 if __name__ == "__main__":
     from detector import Detector
@@ -31,20 +27,6 @@ else:
 
 @dataclass
 class FastAPIWebServer(WebServer):
-    host: str
-    port: int
-    is_active: bool
-    debug: bool
-    object_detection: bool 
-    use_cuda: bool
-    static_directory: str = None
-    temp_directory: str = None
-    pcs: dict = None
-    logger: Any = None
-    socket_app: Any = None
-    ssl_cert: str = None
-    ssl_key: str = None
-    
 
     def __post_init__(self):
         self.env: str = "local.toml"
@@ -58,9 +40,6 @@ class FastAPIWebServer(WebServer):
         self.templates = Jinja2Templates(directory=self.temp_directory)
         if self.pcs is None:
             self.pcs = {}
-
-
-
 
     def server(self):
         @self.app.get("/")
@@ -164,16 +143,6 @@ class FastAPIWebServer(WebServer):
             else:
                 print(f"No RTCPeerConnection found for sid: {sid}")
 
-
-        module_directory = os.path.dirname(os.path.abspath(__file__))
-        self.ssl_cert = os.path.join(module_directory, "..", "cert.pem")
-        self.ssl_key = os.path.join(module_directory, "..", "key.pem")
-
-        ssl_context = None
-        if self.ssl_cert and self.ssl_key:
-            ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
-            ssl_context.load_cert_chain(certfile=self.ssl_cert, keyfile=self.ssl_key)
-
         self.logger.info("FastAPI started")
         uvicorn.run(
             self.socket_app,
@@ -192,12 +161,11 @@ class ObjectDetection(VideoStreamTrack):
     def __init__(self, track, data_channel, sid,use_cuda):
         super().__init__()
         self.track = track
-        self.detector = Detector()
+        self.detector = Detector(use_cuda=use_cuda)
         self.data_channel = data_channel
         self.sid = sid
         self.original_width = None
         self.original_height = None
-        self.use_cuda
 
     async def recv(self):
         frame = await self.track.recv()
@@ -230,8 +198,6 @@ class ObjectDetection(VideoStreamTrack):
 
         return frame 
 
-
-
 def parse_candidate(candidate_str):
     parts = candidate_str.split()
     return {
@@ -243,7 +209,6 @@ def parse_candidate(candidate_str):
         "port": int(parts[5]),
         "type": parts[7],
     }
-
 
 if __name__ == "__main__":
 
@@ -261,9 +226,6 @@ if __name__ == "__main__":
         "log_format": "<green>{time:MMM D, YYYY - HH:mm:ss}</green> || <level>{level}</level> || <red>{file.name}</red> || <cyan>{message}</cyan>||",
         "rotation": "10MB",
     }
-    module_directory = os.path.dirname(os.path.abspath(__file__))
-    ssl_cert = os.path.join(module_directory, "..", "cert.pem")
-    ssl_key = os.path.join(module_directory, "..", "key.pem")
 
     fastapiweb = FastAPIWebServer(
         "0.0.0.0",
@@ -273,8 +235,10 @@ if __name__ == "__main__":
         static_directory="static",
         temp_directory="templates",
         logger=Logger(**logger_configs),
-        ssl_cert=ssl_cert,
-        ssl_key=ssl_key,
+        ssl_cert="../cert.pem",
+        ssl_key="../key.pem",
+        object_detection=True,
+        use_cuda=True
     )
     
 

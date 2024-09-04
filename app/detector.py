@@ -4,12 +4,17 @@ import torch
 
 @dataclass
 class Detector:
+    use_cuda: bool
     model: str = None
     
     def __post_init__(self):
-        self.device = "cuda" if torch.cuda.is_available() else "cpu"
-        self.model = YOLO("yolov10s.pt")
-        self.model.to("cuda")
+        if self.use_cuda and torch.cuda.is_available():
+            self.device = "cuda"
+        else:
+            self.device = "cpu"
+        
+        self.model = YOLO("modules/yolov10s.pt")
+        self.model.to(self.device) 
         self.class_names = self.model.names
 
     def process_frame(self, frame):
@@ -41,8 +46,6 @@ class Detector:
                         "y2": int(y2)
                     }
                 }
-
-
 
                 detections.append(detection)
 

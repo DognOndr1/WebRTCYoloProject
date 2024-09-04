@@ -9,10 +9,6 @@ import argparse, os
 def main(config):
     logger = Logger(**config["Logging"])
 
-    module_directory = os.path.dirname(os.path.abspath(__file__))
-    cert_directory = os.path.join(module_directory,"cert.pem")
-    key_directory = os.path.join(module_directory,"key.pem")
-
     try:
         api_choice = config["API"]["chosen_api"]
         server_params = {
@@ -25,8 +21,8 @@ def main(config):
             server = FastAPIWebServer(
                 **server_params,
                 logger=logger,
-                ssl_cert=cert_directory,
-                ssl_key=key_directory,
+                ssl_cert="./cert.pem",
+                ssl_key="./key.pem",
             )
         elif api_choice == "Flask":
             server = FlaskWebServer(**server_params, logger=logger)
@@ -34,8 +30,8 @@ def main(config):
             server = AIOHTTPWeb(
                 **server_params,
                 logger=logger,
-                ssl_cert=cert_directory,
-                ssl_key=key_directory,
+                ssl_cert="./cert.pem",
+                ssl_key="./key.pem",
             )
         else:
             logger.warning("Invalid API choice")

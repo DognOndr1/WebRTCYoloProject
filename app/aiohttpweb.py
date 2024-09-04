@@ -1,5 +1,4 @@
-import ssl, json, cv2, socketio, aiohttp_jinja2, jinja2
-from typing import Any
+import ssl, json, socketio, aiohttp_jinja2, jinja2
 from dataclasses import dataclass
 from aiohttp import web
 from aiortc import (
@@ -12,7 +11,6 @@ from aiortc import (
 )
 from av import VideoFrame
 from aiortc.contrib.media import MediaRelay
-import cv2,os
 import numpy as np
 
 if __name__ == "__main__":
@@ -26,17 +24,6 @@ else:
 
 @dataclass
 class AIOHTTPWeb(WebServer):
-    host: str
-    port: int
-    is_active: bool
-    object_detection: bool 
-    debug: bool
-    static_directory: str = None
-    temp_directory: str = None
-    logger: Any = None
-    pcs: dict = None
-    ssl_cert: str = None
-    ssl_key: str = None
 
     def __post_init__(self):
         self.sio = socketio.AsyncServer(cors_allowed_origins="*")
@@ -55,7 +42,6 @@ class AIOHTTPWeb(WebServer):
 
     def register_socket_events(self):
 
-        
         @self.sio.event
         async def connect(sid, environ):
             print(f"Client Connected {sid}")
@@ -81,37 +67,32 @@ class AIOHTTPWeb(WebServer):
             if sid in self.pcs:
                 pc = self.pcs[sid]
                 if pc.signalingState == "closed":
-                    pc = RTCPeerConnection(
-                        RTCConfiguration(
-                            iceServers=[RTCIceServer("stun:stun.l.google.com:19302")]
-                        )
-                    )
+                    pc = RTCPeerConnection()
                     self.pcs[sid] = pc
             else:
-                pc = RTCPeerConnection(
-                    RTCConfiguration(
-                        iceServers=[RTCIceServer("stun:stun.l.google.com:19302")]
-                    )
-                )
+                pc = RTCPeerConnection()
                 self.pcs[sid] = pc
 
             offer = RTCSessionDescription(sdp=data["sdp"], type=data["type"])
-            print("Received SDP offer")
+            self.logger.info("Received SDP offer")
             print(json.dumps(data, indent=2))
+
+            dc = pc.createDataChannel("detections")
 
             @pc.on("track")
             def on_track(track):
-                print(f"Track received: {track.kind}")
+                self.logger.info(f"Track received {track.kind}")
                 if track.kind == "video":
-                    obj_detect = ObjectDetection(self.relay.subscribe(track), self.sio, sid=sid)
-                    print("Track added to pc")
-                    pc.addTrack(obj_detect)
+                    print("Object Track Mesajı")
+                    object_track = ObjectDetection(self.relay.subscribe(track), dc, sid=sid,use_cuda=self.use_cuda)
+                    self.logger.info("Track added to PC")
+                    pc.addTrack(object_track)
 
             await pc.setRemoteDescription(offer)
             answer = await pc.createAnswer()
             await pc.setLocalDescription(answer)
 
-            print("Generated SDP answer:")
+            print("Generated SDP answer")
             sdp_answer = json.dumps(
                 {"sdp": pc.localDescription.sdp, "type": pc.localDescription.type},
                 indent=2,
@@ -169,9 +150,6 @@ class AIOHTTPWeb(WebServer):
         self.app.router.add_get("/object_detect", self.get_object)
         self.register_socket_events()
 
-        module_directory = os.path.dirname(os.path.abspath(__file__))
-        self.ssl_cert = os.path.join(module_directory, "..", "cert.pem")
-        self.ssl_key = os.path.join(module_directory, "..", "key.pem")
         ssl_context = None
         if self.ssl_cert and self.ssl_key:
             ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
@@ -185,11 +163,11 @@ class AIOHTTPWeb(WebServer):
         self.server()
 
 class ObjectDetection(VideoStreamTrack):
-    def __init__(self, track, sio, sid):
+    def __init__(self, track, data_channel, sid,use_cuda):
         super().__init__()
         self.track = track
-        self.detector = Detector()
-        self.sio = sio
+        self.detector = Detector(use_cuda=use_cuda)
+        self.data_channel = data_channel
         self.sid = sid
         self.original_width = None
         self.original_height = None
@@ -216,11 +194,14 @@ class ObjectDetection(VideoStreamTrack):
                 'original_height': self.original_height
             }
 
-            await self.sio.emit('detections', json.dumps(data_to_send))
+            if self.data_channel.readyState == "open":
+                self.data_channel.send(json.dumps(data_to_send))
+            else:
+                print("Data channel is not open")
         else:
             print("No detections found")
 
-        return frame  
+        return frame 
 
 def parse_candidate(candidate_str):
     parts = candidate_str.split()
@@ -235,9 +216,6 @@ def parse_candidate(candidate_str):
     }
 
 if __name__ == "__main__":
-    module_directory = os.path.dirname(os.path.abspath(__file__))
-    ssl_cert = os.path.join(module_directory, "cert.pem")
-    ssl_key = os.path.join(module_directory, "key.pem")
 
     aiohttpserver = AIOHTTPWeb(
         host="0.0.0.0",
@@ -248,8 +226,10 @@ if __name__ == "__main__":
         temp_directory="templates",
         logger=None,
         pcs={},
-        ssl_cert=ssl_cert,  
-        ssl_key=ssl_key,  
+        ssl_cert="../cert.pem",
+        ssl_key="../key.pem",
+        object_detection=True,
+        use_cuda=True
     )
 
     aiohttpserver.run()
