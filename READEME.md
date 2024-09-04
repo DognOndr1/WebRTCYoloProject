@@ -124,10 +124,6 @@ or
 openssl req -new -x509 -key key.pem -out cert.pem -days 365 -subj "/C=US/ST=California/L=San Francisco/O=MyCompany/OU=IT/CN=example.com/emailAddress=admin@example.com"
 ```
 
-
-
-
-
 ## Running `main.py`
 to start the application using `main.py`, open a terminal go to project directory and run:
 
