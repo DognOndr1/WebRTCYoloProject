@@ -124,55 +124,6 @@ function connectSocket() {
             log("Error setting remote description: " + error, 'error');
         }
     });
-
-    socket.on('detections', (data) => {
-        try {
-            const parsedData = JSON.parse(data);
-            const detectionsArray = parsedData.detections;
-            const originalWidth = parsedData.original_width;
-            const originalHeight = parsedData.original_height;
-
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            const scaleX = canvas.width / originalWidth;
-            const scaleY = canvas.height / originalHeight;
-
-            detectionsArray.forEach(detection => {
-                if (detection.sid === mySID) {
-                    const { bounding_box, confidence, class_id, class_name } = detection;
-
-                    let { x1, y1, x2, y2 } = bounding_box;
-
-                    x1 *= scaleX;
-                    y1 *= scaleY;
-                    x2 *= scaleX;
-                    y2 *= scaleY;
-
-                    if(delay === false){
-                        ctx.strokeStyle = 'blue';
-                        ctx.lineWidth = 2;
-
-                        ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
-
-                        if (deviceType === "mobile") {
-                            ctx.font = '12px Arial';
-                            ctx.lineWidth = 1;
-                        } else {
-                            ctx.font = '16px Arial';
-                            ctx.lineWidth = 2;
-                        }
-
-                        ctx.fillStyle = 'red';
-
-                        const text = `ID: ${class_id}, ${class_name} Confidence: ${confidence.toFixed(2)}`;
-                        ctx.fillText(text, x1, y1 > 20 ? y1 - 10 : y1 + 15);
-                    }
-                }
-            });
-        } catch (error) {
-            console.error('Error parsing detections:', error);
-        }
-    });
 }
 
 // !----------------------------------------------------------------Video Görünümünü Duyarlı Yapma----------------------------------------------------------------
@@ -235,23 +186,20 @@ function startWebRTC() {
     
     dc = pc.createDataChannel('chat');
 
-    // DataChannel kapandığında interval temizleniyor
     dc.addEventListener('close', () => {
         console.log('DataChannel kapandı');
         clearInterval(dcInterval);
     });
     
-    // DataChannel açıldığında, ping mesajları gönderiliyor
     dc.addEventListener('open', () => {
         console.log('DataChannel açıldı');
         dcInterval = setInterval(() => {
             var message = 'ping ' + current_stamp();
             console.log('Ping mesajı gönderildi: ' + message);
             dc.send(message);
-        }, 1);
+        }, 10);
     });
-    
-    // DataChannel üzerinden mesaj alındığında
+
     dc.addEventListener('message', (evt) => {
         console.log('Mesaj alındı: ' + evt.data);
     
@@ -261,6 +209,54 @@ function startWebRTC() {
         }
     });
 
+
+    pc.ondatachannel = function(event) {
+        const dc = event.channel;
+        dc.onmessage = function(evt) {
+            const data = JSON.parse(evt.data);
+            
+            const originalWidth = data.original_width;
+            const originalHeight = data.original_height;
+    
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+            const scaleX = canvas.width / originalWidth;
+            const scaleY = canvas.height / originalHeight;
+    
+            data.detections.forEach(detection => {
+                if (detection.sid === mySID) {
+                    const { bounding_box, confidence, class_id, class_name } = detection;
+    
+                    let { x1, y1, x2, y2 } = bounding_box;
+    
+                    x1 *= scaleX;
+                    y1 *= scaleY;
+                    x2 *= scaleX;
+                    y2 *= scaleY;
+    
+                    if(delay === false){
+                        ctx.strokeStyle = 'blue';
+                        ctx.lineWidth = 2;
+    
+                        ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
+    
+                        if (deviceType === "mobile") {
+                            ctx.font = '12px Arial';
+                            ctx.lineWidth = 1;
+                        } else {
+                            ctx.font = '16px Arial';
+                            ctx.lineWidth = 2;
+                        }
+    
+                        ctx.fillStyle = 'red';
+    
+                        const text = `ID: ${class_id}, ${class_name} Confidence: ${confidence.toFixed(2)}`;
+                        ctx.fillText(text, x1, y1 > 20 ? y1 - 10 : y1 + 15);
+                    }
+                }
+            });
+        };
+    };
     
     
     pc.oniceconnectionstatechange = () => {

@@ -8,7 +8,7 @@ class Detector:
     
     def __post_init__(self):
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
-        self.model = YOLO("yolov10n.pt")
+        self.model = YOLO("yolov10s.pt")
         self.model.to("cuda")
         self.class_names = self.model.names
 

@@ -4,6 +4,7 @@ port = 8000
 debug = false
 is_active = true
 object_detection = true
+use_cuda = true
 
 [API]
 chosen_api = "Fast"

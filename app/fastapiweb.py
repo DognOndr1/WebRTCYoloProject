@@ -36,6 +36,7 @@ class FastAPIWebServer(WebServer):
     is_active: bool
     debug: bool
     object_detection: bool 
+    use_cuda: bool
     static_directory: str = None
     temp_directory: str = None
     pcs: dict = None
@@ -101,18 +102,14 @@ class FastAPIWebServer(WebServer):
             self.logger.info("Received SDP offer")
             print(json.dumps(data, indent=2))
 
-            @pc.on("datachannel")
-            def on_datachannel(channel):
-                @channel.on("message")
-                def on_message(message):
-                        channel.send("pong" + message[4:])
+            dc = pc.createDataChannel("detections")
 
             @pc.on("track")
             def on_track(track):
                 self.logger.info(f"Track received {track.kind}")
                 if track.kind == "video":
                     print("Object Track Mesajı")
-                    object_track = ObjectDetection(self.relay.subscribe(track), self.sio, sid=sid)
+                    object_track = ObjectDetection(self.relay.subscribe(track), dc, sid=sid,use_cuda=self.use_cuda)
                     self.logger.info("Track added to PC")
                     pc.addTrack(object_track)
 
@@ -192,14 +189,15 @@ class FastAPIWebServer(WebServer):
 
 
 class ObjectDetection(VideoStreamTrack):
-    def __init__(self, track, sio, sid):
+    def __init__(self, track, data_channel, sid,use_cuda):
         super().__init__()
         self.track = track
         self.detector = Detector()
-        self.sio = sio
+        self.data_channel = data_channel
         self.sid = sid
         self.original_width = None
         self.original_height = None
+        self.use_cuda
 
     async def recv(self):
         frame = await self.track.recv()
@@ -223,11 +221,14 @@ class ObjectDetection(VideoStreamTrack):
                 'original_height': self.original_height
             }
 
-            await self.sio.emit('detections', json.dumps(data_to_send))
+            if self.data_channel.readyState == "open":
+                self.data_channel.send(json.dumps(data_to_send))
+            else:
+                print("Data channel is not open")
         else:
             print("No detections found")
 
-        return frame  
+        return frame 
 
 
 
