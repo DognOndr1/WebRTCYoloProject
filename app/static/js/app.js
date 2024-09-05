@@ -12,7 +12,7 @@ const constraints = {
 };
 const startBtn = document.querySelector("button#startButton");
 const stopBtn = document.querySelector("button#stopButton");
-const remoteVideo = document.querySelector("video#remoteVideo");
+const remoteVideo = document.querySelector("video.remoteVideo");
 const logsContainer = document.querySelector(".logs");
 const toggleButton = document.querySelector("#toggleButton");
 const deviceSelect = document.getElementById("devices");
