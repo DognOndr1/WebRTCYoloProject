@@ -1,0 +1,14 @@
+services:
+  yolo:
+    build: 
+        context: .
+        dockerfile: Dockerfile
+    ports:
+      - "8000:8000"  # Host makinenin portu ve konteyner içindeki port
+    volumes:
+      - /logs:/app/logs  # Host'taki app.log dosyasını konteyner içindeki /path/to/logs/app.log dosyasına bağlar
+    network_mode: "host"
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+    runtime: nvidia
+

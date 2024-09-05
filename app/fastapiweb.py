@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request
-import socketio, json, ssl
+import socketio, json
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from dataclasses import dataclass
@@ -40,6 +40,7 @@ class FastAPIWebServer(WebServer):
         self.templates = Jinja2Templates(directory=self.temp_directory)
         if self.pcs is None:
             self.pcs = {}
+        self.data_channels = {}  # Her sid için bir DataChannel tutacağız
 
     def server(self):
         @self.app.get("/")
@@ -65,6 +66,8 @@ class FastAPIWebServer(WebServer):
                 pc = self.pcs[sid]
                 await pc.close()
                 del self.pcs[sid]
+            if sid in self.data_channels:
+                del self.data_channels[sid]
 
         @self.sio.on("sdp")
         async def handle_sdp(sid, data):
@@ -81,14 +84,15 @@ class FastAPIWebServer(WebServer):
             self.logger.info("Received SDP offer")
             print(json.dumps(data, indent=2))
 
-            dc = pc.createDataChannel("detections")
+            dc = pc.createDataChannel(f"detections_{sid}")
+            self.data_channels[sid] = dc
 
             @pc.on("track")
             def on_track(track):
                 self.logger.info(f"Track received {track.kind}")
                 if track.kind == "video":
                     print("Object Track Mesajı")
-                    object_track = ObjectDetection(self.relay.subscribe(track), dc, sid=sid,use_cuda=self.use_cuda)
+                    object_track = ObjectDetection(self.relay.subscribe(track), self.data_channels[sid], sid=sid, use_cuda=self.use_cuda)
                     self.logger.info("Track added to PC")
                     pc.addTrack(object_track)
 
@@ -101,6 +105,7 @@ class FastAPIWebServer(WebServer):
                 {"sdp": pc.localDescription.sdp, "type": pc.localDescription.type},
                 indent=2,
             )
+            
             print(sdp_answer)
 
             await self.sio.emit(
@@ -158,7 +163,7 @@ class FastAPIWebServer(WebServer):
 
 
 class ObjectDetection(VideoStreamTrack):
-    def __init__(self, track, data_channel, sid,use_cuda):
+    def __init__(self, track, data_channel, sid, use_cuda):
         super().__init__()
         self.track = track
         self.detector = Detector(use_cuda=use_cuda)
@@ -192,7 +197,7 @@ class ObjectDetection(VideoStreamTrack):
             if self.data_channel.readyState == "open":
                 self.data_channel.send(json.dumps(data_to_send))
             else:
-                print("Data channel is not open")
+                print(f"Data channel for {self.sid} is not open")
         else:
             print("No detections found")
 

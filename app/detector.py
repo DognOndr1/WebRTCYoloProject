@@ -12,8 +12,9 @@ class Detector:
             self.device = "cuda"
         else:
             self.device = "cpu"
+        print(torch.cuda.is_available())
         
-        self.model = YOLO("modules/yolov10s.pt")
+        self.model = YOLO("modules/yolov10n.pt")
         self.model.to(self.device) 
         self.class_names = self.model.names
 

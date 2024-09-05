@@ -23,6 +23,7 @@ let dc, dcInterval = null
 let mySID = null;
 let delay;
 let timeoutId;
+let dataChannels = {}; 
 
 // !----------------------------------------------------------------Cihaz Türünü Belirleme----------------------------------------------------------------
 function getDeviceType() {
@@ -186,8 +187,33 @@ function startWebRTC() {
     
     dc = pc.createDataChannel('chat');
 
+    dc.addEventListener('close', () => {
+        console.log('DataChannel kapandı');
+        clearInterval(dcInterval);
+    });
+    
+    dc.addEventListener('open', () => {
+        console.log('DataChannel açıldı');
+        dcInterval = setInterval(() => {
+            var message = 'ping ' + current_stamp();
+            dc.send(message);
+        }, 1);
+    });
+
+    dc.addEventListener('message', (evt) => {
+        console.log('Mesaj alındı: ' + evt.data);
+        if (evt.data.substring(0, 4) === 'pong') {
+            var elapsed_ms = current_stamp() - parseInt(evt.data.substring(5), 10);
+            console.log('Pong mesajı alındı, gecikme süresi: ' + elapsed_ms + ' ms');
+        }
+    });
+
     pc.ondatachannel = function(event) {
         const dc = event.channel;
+        const channelLabel = dc.label;
+        const sid = channelLabel.split('_')[1];  // 'detections_<sid>' formatından sid'yi çıkar
+        dataChannels[sid] = dc;
+
         dc.onmessage = function(evt) {
             const data = JSON.parse(evt.data);
             
@@ -233,6 +259,7 @@ function startWebRTC() {
             });
         };
     };
+    
     
     pc.oniceconnectionstatechange = () => {
         log("ICE connection state: " + pc.iceConnectionState);
