@@ -53,7 +53,6 @@ class FastAPIWebServer(WebServer):
 
         @self.sio.on("connect")
         async def connect(sid, env):
-            
             self.logger.info("New Client Connected to This id :" + " " + str(sid))
             if sid in self.pcs:
                 print(f"Existing connection for {sid} found, Closing it")
