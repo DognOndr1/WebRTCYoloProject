@@ -23,7 +23,7 @@ let socket = null;
 let stream = null;
 let isStreaming = false;
 let object_detection = null
-
+let deviceType = getDeviceType();
 
 fetch('/object_detect')   
     .then(response => response.json())  
@@ -34,6 +34,27 @@ fetch('/object_detect')
     .catch(error => { 
             console.error("Error fetching object detection status:", error); 
     });
+
+
+function getDeviceType() {
+    const ua = navigator.userAgent;
+    if (/mobile/i.test(ua)) {
+        return 'mobile';
+    }
+    return 'desktop';
+}
+
+function responsiveVideo() {
+    if (deviceType === "mobile") {
+        remoteVideo.classList.remove("remoteVideoDesktop");
+        remoteVideo.classList.add("remoteVideoMobile");
+    } else {
+        remoteVideo.classList.remove("remoteVideoMobile");
+        remoteVideo.classList.add("remoteVideoDesktop");
+    }
+}
+
+    
 
 
 async function toggleStream() {

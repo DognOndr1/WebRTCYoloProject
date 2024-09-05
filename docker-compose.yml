@@ -3,6 +3,8 @@ services:
     build: 
         context: .
         dockerfile: Dockerfile
+        args:
+          CUDA_VERSION: ${CUDA_VERSION} 
     ports:
       - "8000:8000" 
     volumes:

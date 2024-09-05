@@ -41,6 +41,49 @@ This project implements a real-time object detection system using WebRTC for pee
 
 # Installation Instructions
 
+## Docker and Docker Compose Installation
+
+**1. Install Docker and Docker Compose:**
+
+Ensure Docker and Docker Compose are installed on your system. You can follow the Docker installation guide and the Docker Compose installation guide.
+
+**2.Build Docker Image:**
+In your project root directory, build the Docker image using:
+```bash
+docker compose build --build-arg CUDA_VERSION=your_cuda_version .
+
+```
+
+**3. Start Containers with Docker Compose:**
+Start your application using Docker Compose by running:
+
+```bash
+docker-compose up
+```
+
+This command will start all necessary containers as defined in the docker-compose.yml file.
+
+## Docker Compose File
+
+Here is the updated `docker-compose.yml` file:
+
+```bash
+services:
+  yolo:
+    build: 
+        context: .
+        dockerfile: Dockerfile
+        args:
+          CUDA_VERSION: ${CUDA_VERSION} 
+    ports:
+      - "8000:8000" 
+    volumes:
+      - /logs:/app/logs  
+    network_mode: "host"
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+    runtime: nvidia
+```
 
 
 ## Conda Environment Installation
@@ -87,7 +130,6 @@ _This project requires the use of CUDA on NVIDIA GPUs for optimal performance. F
 
 You can check with this: `nvidi-smi`
 
-![NVIDIA-SMI](app/static/images/nvidia-smi.png)
 
 **4. Set Up Environment Variables**
 - After installing CUDA, add directories to your system Path
@@ -114,8 +156,8 @@ You can check with this: `nvidi-smi`
 ```
 
 ```bash
-openssl genpkey -algorithm RSA -out key.pem -pass pass:
-openssl req -new -x509 -key key.pem -out cert.pem -days 365 -subj /CN=example.com -passin pass:
+openssl req -x509 -newkey rsa:4096 -nodes -keyout server_key.pem -out server_cert.pem -days 365 -subj "/C=TR/ST=State/L=City/O=Organization/OU=Unit/CN=localhost"
+
 ```
 
 ## Running `main.py`
@@ -161,20 +203,4 @@ To specify a configuration file:
 ```bash
 python main.py --env prod.toml
 ```
-
-# Contact
-
-
-<div style="display:flex;flex-direction:column;">
- <div style="display:flex;gap:1rem;">
-    <a href="mailto:dognondr@gmail.com"><img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Gmail_Icon.png" alt="Açıklama" width="25" /> </a>
- </div>
-  <div style="display:flex;gap:1rem;">
-    <a href="mailto:dognondr@gmail.com"><img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Gmail_Icon.png" alt="Açıklama" width="25" /> </a>
- </div>
-  <div style="display:flex;gap:1rem;">
-    <a href="mailto:dognondr@gmail.com"><img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Gmail_Icon.png" alt="Açıklama" width="25" /> </a>
- </div>
-</div>
-
 

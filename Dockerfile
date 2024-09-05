@@ -1,4 +1,5 @@
-FROM nvidia/cuda:12.4.0-base-ubuntu20.04
+ARG CUDA_VERSION="12.4.0"
+FROM nvidia/cuda:${CUDA_VERSION}-base-ubuntu20.04
 
 # Gerekli bağımlılıkların yüklenmesi ve saat diliminin ayarlanması
 RUN apt-get update && \
