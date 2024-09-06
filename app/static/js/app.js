@@ -185,7 +185,7 @@ function startWebRTC() {
         }
     };
     
-    dc = pc.createDataChannel('chat');
+    dc = pc.createDataChannel('videoDataChannel'); // Data channel'ı videoDataChannel olarak adlandırıyoruz.
 
     dc.addEventListener('close', () => {
         console.log('DataChannel kapandı');
@@ -197,7 +197,7 @@ function startWebRTC() {
         dcInterval = setInterval(() => {
             var message = 'ping ' + current_stamp();
             dc.send(message);
-        }, 1);
+        }, 1000); // Gecikme süresi 1 saniye
     });
 
     dc.addEventListener('message', (evt) => {
@@ -211,16 +211,22 @@ function startWebRTC() {
     pc.ondatachannel = function(event) {
         const dc = event.channel;
         const channelLabel = dc.label;
-        const sid = channelLabel.split('_')[1];  // 'detections_<sid>' formatından sid'yi çıkar
+        const sid = channelLabel.split('_')[1];
         dataChannels[sid] = dc;
-
+    
         dc.onmessage = function(evt) {
             const data = JSON.parse(evt.data);
             
             const originalWidth = data.original_width;
             const originalHeight = data.original_height;
     
+            // Canvas'ı temizle
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+            if (data.detections === 0) {
+                // Detection yok, canvas'ı temizle
+                return;
+            }
     
             const scaleX = canvas.width / originalWidth;
             const scaleY = canvas.height / originalHeight;
@@ -236,20 +242,14 @@ function startWebRTC() {
                     x2 *= scaleX;
                     y2 *= scaleY;
     
-                    if(delay === false){
+                    if (delay === false) {
                         ctx.strokeStyle = 'blue';
                         ctx.lineWidth = 2;
     
                         ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
     
-                        if (deviceType === "mobile") {
-                            ctx.font = '12px Arial';
-                            ctx.lineWidth = 1;
-                        } else {
-                            ctx.font = '16px Arial';
-                            ctx.lineWidth = 2;
-                        }
-    
+                        ctx.font = deviceType === "mobile" ? '12px Arial' : '16px Arial';
+                        ctx.lineWidth = deviceType === "mobile" ? 1 : 2;
                         ctx.fillStyle = 'red';
     
                         const text = `ID: ${class_id}, ${class_name} Confidence: ${confidence.toFixed(2)}`;
@@ -259,7 +259,6 @@ function startWebRTC() {
             });
         };
     };
-    
     
     pc.oniceconnectionstatechange = () => {
         log("ICE connection state: " + pc.iceConnectionState);
@@ -273,6 +272,11 @@ function startWebRTC() {
         }
     };
 
+
+
+
+    let intervalId = null;
+
     pc.ontrack = (event) => {
         const incomingStream = event.streams[0];
         if (incomingStream) {
@@ -283,6 +287,12 @@ function startWebRTC() {
             log("No streams available in the remote track event");
         }
     };
+    
+    window.addEventListener('beforeunload', () => {
+        if (intervalId) {
+            clearInterval(intervalId);
+        }
+    });
 
     stream.getTracks().forEach(track => pc.addTrack(track, stream));
 
@@ -295,6 +305,7 @@ function startWebRTC() {
         log("Error creating or setting local description: " + error, 'error');
     });
 }
+
 
 // !----------------------------------------------------------------Bağlı Cihazları Alma--------------------------------------------------------------------------------------
 async function getConnectedDevices() {
@@ -343,7 +354,7 @@ async function start() {
                 loader.classList.remove("loader");
                 delay = false; 
                 log("Detection started after 20 seconds");
-            }, 20000);
+            }, 5000);
             
         } else {
             log("No video device selected", 'warning');

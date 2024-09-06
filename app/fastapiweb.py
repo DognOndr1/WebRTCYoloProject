@@ -113,6 +113,10 @@ class FastAPIWebServer(WebServer):
                 {"sdp": pc.localDescription.sdp, "type": pc.localDescription.type},
                 to=sid,
             )
+
+        @self.sio.on("video_dimensions")
+        async def video_dimensions(sid, data):
+            print(f"Received video dimensions from {sid}: {data}")
         
 
         @self.sio.on("ice_candidate")
@@ -166,11 +170,9 @@ class ObjectDetection(VideoStreamTrack):
     def __init__(self, track, data_channel, sid, use_cuda):
         super().__init__()
         self.track = track
-        self.detector = Detector(use_cuda=use_cuda)
+        self.detector = Detector(use_cuda=use_cuda,filter_classes = [0,1])
         self.data_channel = data_channel
         self.sid = sid
-        self.original_width = None
-        self.original_height = None
 
     async def recv(self):
         frame = await self.track.recv()
@@ -179,10 +181,7 @@ class ObjectDetection(VideoStreamTrack):
 
         img = np.array(frame.to_ndarray(format="bgr24"))
 
-        if self.original_width is None or self.original_height is None:
-            self.original_height, self.original_width = img.shape[:2]
-
-        detections = self.detector.process_frame(img)
+        detections, original_width, original_height = self.detector.process_frame(img)
 
         if detections:
             for detection in detections:
@@ -190,18 +189,22 @@ class ObjectDetection(VideoStreamTrack):
 
             data_to_send = {
                 'detections': detections,
-                'original_width': self.original_width,
-                'original_height': self.original_height
+                'original_width': original_width,
+                'original_height': original_height
+            }
+        else:
+            data_to_send = {
+                'detections': 0,
+                'original_width': original_width,
+                'original_height': original_height
             }
 
-            if self.data_channel.readyState == "open":
-                self.data_channel.send(json.dumps(data_to_send))
-            else:
-                print(f"Data channel for {self.sid} is not open")
+        if self.data_channel.readyState == "open":
+            self.data_channel.send(json.dumps(data_to_send))
         else:
-            print("No detections found")
+            print(f"Data channel for {self.sid} is not open")
 
-        return frame 
+        return frame
 
 def parse_candidate(candidate_str):
     parts = candidate_str.split()
