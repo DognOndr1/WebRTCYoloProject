@@ -220,13 +220,7 @@ function startWebRTC() {
             const originalWidth = data.original_width;
             const originalHeight = data.original_height;
     
-            // Canvas'ı temizle
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-            if (data.detections === 0) {
-                // Detection yok, canvas'ı temizle
-                return;
-            }
     
             const scaleX = canvas.width / originalWidth;
             const scaleY = canvas.height / originalHeight;
@@ -259,7 +253,6 @@ function startWebRTC() {
             });
         };
     };
-    
     pc.oniceconnectionstatechange = () => {
         log("ICE connection state: " + pc.iceConnectionState);
     };
@@ -272,7 +265,7 @@ function startWebRTC() {
         }
     };
 
-
+    const denemeVideo = document.querySelector("video.denemeVideo")
 
 
     let intervalId = null;
@@ -281,7 +274,24 @@ function startWebRTC() {
         const incomingStream = event.streams[0];
         if (incomingStream) {
             if (remoteVideo.srcObject !== incomingStream) {
+                denemeVideo.srcObject = incomingStream;
                 log("Remote video stream set");
+    
+
+                if (intervalId) {
+                    clearInterval(intervalId);
+                }
+    
+                intervalId = setInterval(() => {
+                    const { width, height } = remoteVideo.getBoundingClientRect();
+                    const videoDimensions = {
+                        original_width: width,
+                        original_height: height
+                    };
+
+                    socket.emit('video_dimensions', videoDimensions);
+                    log("Video dimensions sent to server");
+                }, 1000); 
             }
         } else {
             log("No streams available in the remote track event");
@@ -354,7 +364,7 @@ async function start() {
                 loader.classList.remove("loader");
                 delay = false; 
                 log("Detection started after 20 seconds");
-            }, 5000);
+            }, 500);
             
         } else {
             log("No video device selected", 'warning');

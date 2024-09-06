@@ -1,11 +1,12 @@
+import json
+from dataclasses import dataclass
+import numpy as np
+import socketio
 from fastapi import FastAPI, Request
-import socketio, json
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
-from dataclasses import dataclass
-import uvicorn
 from fastapi.responses import JSONResponse
-import numpy as np
+import uvicorn
 from aiortc import (
     RTCPeerConnection,
     RTCSessionDescription,
@@ -170,7 +171,7 @@ class ObjectDetection(VideoStreamTrack):
     def __init__(self, track, data_channel, sid, use_cuda):
         super().__init__()
         self.track = track
-        self.detector = Detector(use_cuda=use_cuda,filter_classes = [0,1])
+        self.detector = Detector(use_cuda=use_cuda)
         self.data_channel = data_channel
         self.sid = sid
 

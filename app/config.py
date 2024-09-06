@@ -1,8 +1,6 @@
 import toml
 import os
 
-
-
 class ConfigLoader:
     """
     Konfigürasyon dosyalarını yükleyen bir sınıf.

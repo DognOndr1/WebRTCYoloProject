@@ -3,8 +3,7 @@ from app.flaskweb import FlaskWebServer
 from app.config import ConfigLoader
 from app.logs import Logger
 from app.aiohttpweb import AIOHTTPWeb
-import argparse, os
-
+import argparse
 
 def main(config):
     logger = Logger(**config["Logging"])

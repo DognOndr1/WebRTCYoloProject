@@ -64,7 +64,7 @@ This project implements a real-time object detection system using WebRTC for pee
 Make sure you have `requirements.txt` in your project root directory and make sure you are in project root `username@username:~/Project$` like this (This is for Ubuntu)
 
 ```bash
-    pip install -r requirement.txt
+    pip install -r requirements.txt
 ```
 
 ## CUDA Installation and Usage
@@ -109,19 +109,10 @@ You can check with this: `nvidi-smi`
 ### Before Run You Need SSL KEY and CERTIFICATE
 
 **You can use this line of code**
-``` 
     First make sure you are in the project directory
-```
 
 ```bash
-openssl genpkey -algorithm RSA -out key.pem -pass pass:
-openssl req -new -x509 -key key.pem -out cert.pem -days 365 -subj /CN=example.com -passin pass:
-```
-
-or 
-
-```bash
-openssl req -new -x509 -key key.pem -out cert.pem -days 365 -subj "/C=US/ST=California/L=San Francisco/O=MyCompany/OU=IT/CN=example.com/emailAddress=admin@example.com"
+openssl req -x509 -newkey rsa:4096 -nodes -keyout server_key.pem -out server_cert.pem -days 365 -subj "/C=TR/ST=State/L=City/O=Organization/OU=Unit/CN=localhost"
 ```
 
 ## Running `main.py`
@@ -159,28 +150,4 @@ If you want to run specific modules directly, navigate to the `app` directory an
 ```bash
     python aiohttpweb.py
 ```
-
-# Configuration
-The application uses TOML files for configuration. You can choose between `local.toml` and `prod.toml` when running the application.
-
-To specify a configuration file:
-```bash
-python main.py --env prod.toml
-```
-
-# Contact
-
-
-<div style="display:flex;flex-direction:column;">
- <div style="display:flex;gap:1rem;">
-    <a href="mailto:dognondr@gmail.com"><img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Gmail_Icon.png" alt="Açıklama" width="25" /> </a>
- </div>
-  <div style="display:flex;gap:1rem;">
-    <a href="mailto:dognondr@gmail.com"><img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Gmail_Icon.png" alt="Açıklama" width="25" /> </a>
- </div>
-  <div style="display:flex;gap:1rem;">
-    <a href="mailto:dognondr@gmail.com"><img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Gmail_Icon.png" alt="Açıklama" width="25" /> </a>
- </div>
-</div>
-
 
